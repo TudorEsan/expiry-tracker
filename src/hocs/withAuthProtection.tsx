@@ -1,14 +1,11 @@
-import React, { useEffect, useState, FC } from "react";
-import { View, ActivityIndicator } from "react-native";
-import { NavigationProp, ParamListBase } from "@react-navigation/native";
-import { User, onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../firebase.config";
+// hocs/withAuthProtection.tsx
+import React, { useEffect, useState, FC } from 'react';
+import { View, ActivityIndicator } from 'react-native';
+import { User, onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../../firebase.config';
 
-interface Props {
-  navigation: NavigationProp<ParamListBase>;
-}
-const withAuthProtection = (WrappedComponent: FC<Props>) => {
-  return (props: any) => {
+const withAuthProtection = <P extends object>(WrappedComponent: FC<P>) => {
+  return (props: P) => {
     const [user, setUser] = useState<User | null>(null);
     const [checkingStatus, setCheckingStatus] = useState(true);
 
@@ -17,23 +14,21 @@ const withAuthProtection = (WrappedComponent: FC<Props>) => {
         setUser(user);
         setCheckingStatus(false);
       });
-      return unsubscribe;
+      return unsubscribe; // Unsubscribe on unmount
     }, []);
 
     if (checkingStatus) {
+      // Return a loading indicator while checking user status
       return (
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          <ActivityIndicator size="large" />
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size='large' />
         </View>
       );
     }
 
     if (!user) {
-      // If there is no user logged in, navigate to the login screen
-      console.log("No user logged in");
-      props.navigation.navigate("Login");
+      // If there is no user logged in, don't render the component
+      // Handle redirection or display a message based on your app's flow
       return null;
     }
 
