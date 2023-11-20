@@ -1,17 +1,21 @@
 // App.tsx
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator ,StackHeaderProps} from '@react-navigation/stack';
 import LoginScreen from './src/pages/Login';
 import Home from './src/pages/Home';
 import RegisterScreen from './src/pages/Register';
 import LoadingScreen from './src/pages/LoadingScreen';
 import useAuth from './src/hooks/useAuth';
+import AddProduct from './src/pages/AddProduct';
+import { HeaderButtons, Item } from 'react-navigation-header-buttons';
+import CustomHeader from './src/pages/CustomHeader';
 
 export type RootStackParamList = {
   Home: undefined;
   Login: undefined;
   Register: undefined;
+  AddProduct: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -27,15 +31,29 @@ const App: React.FC = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator >
         {currentUser ? (
           // User is signed in
-          <Stack.Screen name="Home" component={Home} />
+          <React.Fragment>
+            <Stack.Screen name="Home" component={Home}
+            options={{
+              header: (props) => <CustomHeader {...props} />,
+            }}
+            />
+            <Stack.Screen name="AddProduct" component={AddProduct}
+            options={{
+              header: (props) => <CustomHeader {...props} />,
+            }} />
+          </React.Fragment>
         ) : (
           // No user is signed in
           <>
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Register" component={RegisterScreen} />
+            <Stack.Screen name="Login" component={LoginScreen} 
+             options={{ headerShown: false }} 
+             />
+            <Stack.Screen name="Register" component={RegisterScreen} 
+             options={{ headerShown: false }} 
+            />
           </>
         )}
       </Stack.Navigator>
