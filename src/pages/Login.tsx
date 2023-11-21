@@ -5,7 +5,11 @@ import { auth } from "../../firebase.config";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../App";
+import { NavigationProp, ParamListBase } from "@react-navigation/native";
 
+interface Props {
+  navigation: NavigationProp<ParamListBase>;
+}
 
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const [email, setEmail] = useState<string>("");
