@@ -3,6 +3,9 @@ import React, { useState } from "react";
 import { View, Alert, StyleSheet, Text, Platform } from "react-native";
 import { Input, Button } from "react-native-elements";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
+import RNPickerSelect from "react-native-picker-select";
+
+
 
 import { db } from "../../firebase.config";
 import { collection } from "firebase/firestore";
@@ -17,6 +20,15 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
   const [prodCategory, setProdCategory] = useState<string>("");
   const [prodExpiryDate, setProdExpiryDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const categories = [
+    { label: "Electronics", value: "electronics" },
+    { label: "Books", value: "books" },
+    { label: "Clothing", value: "clothing" },
+    { label: "Home", value: "home" },
+    { label: "Food", value: "food" },
+  ];
+  // this could be done on the server
 
   const handleDateChange = (event: any, date: any) => {
     setShowDatePicker(Platform.OS === "ios"); // On iOS, DateTimePicker is shown in a modal
@@ -54,13 +66,13 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
         inputContainerStyle={{ borderBottomWidth: 0 }} // Hide underline
         style={styles.input}
       />
-      <Input
-        placeholder="Category"
-        value={prodCategory}
-        onChangeText={setProdCategory}
-        inputContainerStyle={{ borderBottomWidth: 0 }} // Hide underline
-        style={styles.input}
+      <RNPickerSelect
+        onValueChange={(value) => setProdCategory(value)}
+        items={categories}
+        placeholder={{ label: "Select a category", value: null }}
+        style={pickerSelectStyles}
       />
+
       <Text>{prodExpiryDate.toLocaleDateString()}</Text>
       <Button title="Select Date" onPress={showDatepicker} />
       {showDatePicker && (
@@ -127,6 +139,33 @@ const styles = StyleSheet.create({
   signupText: {
     color: "black",
     marginRight: 25,
+  },
+})
+
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 4,
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
+    marginVertical: 10,
+    width: "100%",
+  },
+  inputAndroid: {
+    fontSize: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 0.5,
+    borderColor: 'purple',
+    borderRadius: 8,
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
+    marginVertical: 10,
+    width: "100%",
   },
 });
 
