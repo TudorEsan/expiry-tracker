@@ -7,13 +7,14 @@ import {
   StyleSheet,
   TouchableOpacity,
   Platform,
+  Modal,
 } from "react-native";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
 
 import { signOut } from "firebase/auth";
 import { auth, firebase, db } from "../../firebase.config";
 import withAuthProtection from "../hocs/withAuthProtection";
-import { collection, doc, onSnapshot } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, onSnapshot, query, where } from "firebase/firestore";
 import { NOTIFY_BEFORE } from "../config";
 import { Alert } from "react-native";
 
@@ -28,6 +29,8 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     navigation.navigate("AddProduct");
   };
   const [products, setProducts] = useState<any[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const handleSignOut = async () => {
     try {
@@ -35,6 +38,32 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       navigation.navigate("Login");
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const handleProductClick = (product: any) => {
+    setSelectedProduct(product);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+  
+  const deleteProduct = async (product: any) => {
+    const querySnapshot = await getDocs(
+      query(collection(db, "products"), where("name", '==', product.name))
+    );
+    
+    if (!querySnapshot.empty) {
+      const docRef = querySnapshot.docs[0].ref;
+      await deleteDoc(docRef)
+        .then(() => {
+          Alert.alert(product.name + " deleted successfully!");
+        })
+        .catch((error) => {
+          Alert.alert("Error:", error.message);
+        });
     }
   };
 
@@ -97,6 +126,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     return date.getTime() - now.getTime() <= NOTIFY_BEFORE;
   };
 
+
   return (
     <View style={styles.container}>
       <Text style={styles.productText}>My products:</Text>
@@ -105,7 +135,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         const expiringSoon = isExpiringSoon(product.expiry_date);
 
         return (
-          <View style={styles.productContainer} key={index}>
+          <TouchableOpacity style={styles.productContainer} key={index} onPress={() => handleProductClick(product)}>
             <View style={styles.productDetails}>
               <Text style={styles.productName}>{product.name}</Text>
               <Text
@@ -118,9 +148,27 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
               </Text>
             </View>
             <Text style={styles.productCategory}>{product.category}</Text>
-          </View>
+          </TouchableOpacity>
         );
       })}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={closeModal}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text>{selectedProduct?.name}</Text>
+            {/* <Button title="Edit" onPress={closeModal} /> */}
+            {/* <Button title="Delete" onPress={deleteProduct(selectedProduct)} /> */}
+            <TouchableOpacity onPress={() => deleteProduct(selectedProduct)}>
+              <Text>Delete</Text>
+            </TouchableOpacity>
+            <Button title="Close" onPress={closeModal} />
+          </View>
+        </View>
+      </Modal>
       <TouchableOpacity
         style={styles.addProductButton}
         onPress={handleAddProduct}
@@ -182,6 +230,27 @@ const styles = StyleSheet.create({
   },
   expiringSoon: {
     color: "red",
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
 });
 export default withAuthProtection(HomeScreen);
