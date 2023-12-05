@@ -1,6 +1,13 @@
 // screens/HomeScreen.tsx
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  Button,
+  StyleSheet,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
 
 import { signOut } from "firebase/auth";
@@ -8,6 +15,7 @@ import { auth, firebase, db } from "../../firebase.config";
 import withAuthProtection from "../hocs/withAuthProtection";
 import { collection, doc, onSnapshot } from "firebase/firestore";
 import { NOTIFY_BEFORE } from "../config";
+// import PushNotification from "react-native-push-notification";
 
 interface Props {
   navigation: NavigationProp<ParamListBase>;
@@ -29,6 +37,14 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   useEffect(() => {
+    // PushNotification.configure({
+    //   // ... configure as needed ...
+    //   onNotification: function (notification) {
+    //     console.log("NOTIFICATION:", notification);
+    //   },
+    //   requestPermissions: Platform.OS === "ios",
+    // });
+
     const unsubscribe = onSnapshot(collection(db, "products"), (snapshot) => {
       const productsList = snapshot.docs
         .map((doc) => {
@@ -43,8 +59,26 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       setProducts(productsList);
     });
 
+    // const checkProducts = () => {
+    //   products.forEach((product) => {
+    //     const now = new Date().getTime();
+    //     if (product.expiry_date - now <= NOTIFY_BEFORE) {
+    //       PushNotification.localNotification({
+    //         title: "Product Expiring Soon",
+    //         message: `${product.name} is expiring soon!`,
+    //         // ... other notification options ...
+    //       });
+    //     }
+    //   });
+    // };
+
+    // const checkInterval = setInterval(checkProducts, 1000 * 60); // Check every minute
+
     // Cleanup subscription on unmount
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      clearInterval(checkInterval);
+    };
   }, []);
 
   const isExpiringSoon = (date: Date) => {

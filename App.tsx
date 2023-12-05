@@ -10,6 +10,8 @@ import useAuth from './src/hooks/useAuth';
 import AddProduct from './src/pages/AddProduct';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import CustomHeader from './src/pages/CustomHeader';
+import { registerRootComponent } from 'expo';
+
 
 export type RootStackParamList = {
   Home: undefined;
@@ -60,5 +62,5 @@ const App: React.FC = () => {
     </NavigationContainer>
   );
 };
-
+registerRootComponent(App)
 export default App;
