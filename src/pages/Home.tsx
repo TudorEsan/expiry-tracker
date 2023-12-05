@@ -7,6 +7,7 @@ import { signOut } from "firebase/auth";
 import { auth, firebase, db } from "../../firebase.config";
 import withAuthProtection from "../hocs/withAuthProtection";
 import { collection, doc, onSnapshot } from "firebase/firestore";
+import { NOTIFY_BEFORE } from "../config";
 
 interface Props {
   navigation: NavigationProp<ParamListBase>;
@@ -29,10 +30,16 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "products"), (snapshot) => {
-      const productsList = snapshot.docs.map((doc) => {
-        const data = doc.data();
-        return data;
-      });
+      const productsList = snapshot.docs
+        .map((doc) => {
+          const data = doc.data();
+          return {
+            ...data,
+            expiry_date: new Date(data.expiry_date),
+          };
+        })
+        // @ts-ignore
+        .sort((a, b) => a.expiry_date - b.expiry_date);
       setProducts(productsList);
     });
 
@@ -40,17 +47,30 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     return () => unsubscribe();
   }, []);
 
+  const isExpiringSoon = (date: Date) => {
+    const now = new Date();
+    return date.getTime() - now.getTime() <= NOTIFY_BEFORE;
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.productText}>My products:</Text>
       {products.map((product, index) => {
-        const expiryDate = new Date(product.expiry_date);
-        const formattedDate = expiryDate.toLocaleDateString();
+        const formattedDate = product.expiry_date.toLocaleDateString();
+        const expiringSoon = isExpiringSoon(product.expiry_date);
+
         return (
           <View style={styles.productContainer} key={index}>
             <View style={styles.productDetails}>
               <Text style={styles.productName}>{product.name}</Text>
-              <Text style={styles.productDate}>{formattedDate}</Text>
+              <Text
+                style={[
+                  styles.productDate,
+                  expiringSoon && styles.expiringSoon,
+                ]}
+              >
+                {formattedDate}
+              </Text>
             </View>
             <Text style={styles.productCategory}>{product.category}</Text>
           </View>
@@ -114,6 +134,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "black",
     fontStyle: "italic",
+  },
+  expiringSoon: {
+    color: "red",
   },
 });
 export default withAuthProtection(HomeScreen);
