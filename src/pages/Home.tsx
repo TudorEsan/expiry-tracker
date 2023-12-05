@@ -15,6 +15,8 @@ import { auth, firebase, db } from "../../firebase.config";
 import withAuthProtection from "../hocs/withAuthProtection";
 import { collection, doc, onSnapshot } from "firebase/firestore";
 import { NOTIFY_BEFORE } from "../config";
+import { Alert } from "react-native";
+
 // import PushNotification from "react-native-push-notification";
 
 interface Props {
@@ -56,6 +58,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         })
         // @ts-ignore
         .sort((a, b) => a.expiry_date - b.expiry_date);
+      checkForExpiringProducts(productsList);
       setProducts(productsList);
     });
 
@@ -77,9 +80,17 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     // Cleanup subscription on unmount
     return () => {
       unsubscribe();
-      clearInterval(checkInterval);
     };
   }, []);
+
+  const checkForExpiringProducts = (productsList: any[]) => {
+    const now = new Date().getTime();
+    productsList.forEach((product) => {
+      if (product.expiry_date - now <= NOTIFY_BEFORE) {
+        Alert.alert("Expiration Alert", `${product.name} is expiring soon!`);
+      }
+    });
+  };
 
   const isExpiringSoon = (date: Date) => {
     const now = new Date();
