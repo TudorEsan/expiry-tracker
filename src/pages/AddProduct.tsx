@@ -1,12 +1,12 @@
-import { addDoc } from 'firebase/firestore/lite';
-import React, { useState } from 'react';
-import { View, Alert, StyleSheet, Text, Platform  } from "react-native";
-import { Input, Button } from 'react-native-elements';
+import { addDoc } from "firebase/firestore";
+import React, { useState } from "react";
+import { View, Alert, StyleSheet, Text, Platform } from "react-native";
+import { Input, Button } from "react-native-elements";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
 
 import { db } from "../../firebase.config";
-import { collection } from "firebase/firestore/lite";
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { collection } from "firebase/firestore";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 interface Props {
   navigation: NavigationProp<ParamListBase>;
@@ -18,8 +18,8 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
   const [prodExpiryDate, setProdExpiryDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-const handleDateChange = (event: any, date: any) => {
-    setShowDatePicker(Platform.OS === 'ios'); // On iOS, DateTimePicker is shown in a modal
+  const handleDateChange = (event: any, date: any) => {
+    setShowDatePicker(Platform.OS === "ios"); // On iOS, DateTimePicker is shown in a modal
 
     if (date !== undefined) {
       setProdExpiryDate(date);
@@ -31,19 +31,19 @@ const handleDateChange = (event: any, date: any) => {
   };
 
   const addProduct = async () => {
-    await addDoc(collection(db, 'products'), {
+    await addDoc(collection(db, "products"), {
       name: prodName,
       category: prodCategory,
-      expiry_date: prodExpiryDate
+      expiry_date: prodExpiryDate.toUTCString(),
     })
       .then(() => {
         Alert.alert("Product added successfully!");
-        navigation.navigate('Home');
+        navigation.navigate("Home");
       })
       .catch((error) => {
         Alert.alert("Error:", error.message);
       });
-  }
+  };
 
   return (
     <View style={styles.container}>
@@ -68,26 +68,26 @@ const handleDateChange = (event: any, date: any) => {
           value={prodExpiryDate}
           mode="date"
           is24Hour={true}
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          display={Platform.OS === "ios" ? "spinner" : "default"}
           onChange={handleDateChange}
         />
       )}
       <Button
-            title="Add Product"
-            onPress={addProduct}
-            buttonStyle={styles.loginButton}
-            titleStyle={styles.loginButtonText} // Center text horizontally
-          />
+        title="Add Product"
+        onPress={addProduct}
+        buttonStyle={styles.loginButton}
+        titleStyle={styles.loginButtonText} // Center text horizontally
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex:1,
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f2f2f2", 
+    backgroundColor: "#f2f2f2",
     paddingHorizontal: 15,
   },
   labelContainer: {
@@ -104,21 +104,17 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 25,
     paddingHorizontal: 20,
-    
   },
   loginButton: {
-
     backgroundColor: "black",
     marginTop: 50,
     width: "100%",
-    borderRadius: 25, 
+    borderRadius: 25,
     justifyContent: "center",
-    alignItems:"center",
-    
+    alignItems: "center",
   },
   loginButtonText: {
-    marginRight:80,
-   
+    marginRight: 80,
   },
   signupButton: {
     backgroundColor: "transparent",
@@ -127,11 +123,10 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "black",
-    
   },
   signupText: {
     color: "black",
-    marginRight:25,
+    marginRight: 25,
   },
 });
 

@@ -1,21 +1,20 @@
 // screens/HomeScreen.tsx
 import React, { useEffect, useState } from "react";
-import { View, Text, Button , StyleSheet, TouchableOpacity} from "react-native";
+import { View, Text, Button, StyleSheet, TouchableOpacity } from "react-native";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
 
 import { signOut } from "firebase/auth";
 import { auth, firebase, db } from "../../firebase.config";
 import withAuthProtection from "../hocs/withAuthProtection";
-import { collection, doc, getDocs } from "firebase/firestore/lite";
+import { collection, doc, onSnapshot } from "firebase/firestore";
 
 interface Props {
   navigation: NavigationProp<ParamListBase>;
 }
 
 const HomeScreen: React.FC<Props> = ({ navigation }) => {
-
   const handleAddProduct = () => {
-    navigation.navigate('AddProduct');
+    navigation.navigate("AddProduct");
   };
   const [products, setProducts] = useState<any[]>([]);
 
@@ -29,25 +28,24 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const productsCol = collection(db, 'products');
-        const productsSnapshot = await getDocs(productsCol);
-        const productsList = productsSnapshot.docs.map(doc => doc.data());
-        setProducts(productsList);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      }
-    };
-    fetchProducts();
+    const unsubscribe = onSnapshot(collection(db, "products"), (snapshot) => {
+      const productsList = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        return data;
+      });
+      setProducts(productsList);
+    });
+
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
   }, []);
+
   return (
     <View style={styles.container}>
-    
       <Text style={styles.productText}>My products:</Text>
       {products.map((product, index) => {
-        const expiryDate = product.expiry_date.toDate(); 
-        const formattedDate = expiryDate.toLocaleDateString(); 
+        const expiryDate = new Date(product.expiry_date);
+        const formattedDate = expiryDate.toLocaleDateString();
         return (
           <View style={styles.productContainer} key={index}>
             <View style={styles.productDetails}>
@@ -58,7 +56,10 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
           </View>
         );
       })}
-      <TouchableOpacity style={styles.addProductButton} onPress={handleAddProduct}>
+      <TouchableOpacity
+        style={styles.addProductButton}
+        onPress={handleAddProduct}
+      >
         <Text style={styles.addProductButtonText}>+</Text>
       </TouchableOpacity>
     </View>
@@ -66,38 +67,34 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 };
 const styles = StyleSheet.create({
   container: {
-    flex:1,
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f2f2f2", 
+    backgroundColor: "#f2f2f2",
     paddingHorizontal: 15,
-   
-   
   },
-  productText:
-  {
+  productText: {
     fontSize: 20,
-   
   },
   addProductButton: {
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: 'black',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "black",
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   addProductButtonText: {
     fontSize: 30,
-    color:"white",
+    color: "white",
   },
   productContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     borderBottomWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     paddingVertical: 10,
     marginBottom: 10,
   },
@@ -106,18 +103,17 @@ const styles = StyleSheet.create({
   },
   productName: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 5,
   },
   productDate: {
     fontSize: 14,
-    color: '#888',
+    color: "#888",
   },
   productCategory: {
     fontSize: 16,
-    color: 'black',
-    fontStyle:'italic',
+    color: "black",
+    fontStyle: "italic",
   },
-
 });
 export default withAuthProtection(HomeScreen);
