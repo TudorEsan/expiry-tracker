@@ -15,14 +15,15 @@ import { HeaderButtons, Item } from "react-navigation-header-buttons";
 import CustomHeader from "./src/pages/CustomHeader";
 import { registerRootComponent } from "expo";
 import { config } from "@gluestack-ui/config";
-import { GluestackUIProvider } from '@gluestack-ui/themed';
-
+import { GluestackUIProvider } from "@gluestack-ui/themed";
+import { Analytics } from "./src/pages/Analytics";
 
 export type RootStackParamList = {
   Home: undefined;
   Login: undefined;
   Register: undefined;
   AddProduct: undefined;
+  Analytics: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -46,6 +47,13 @@ const App: React.FC = () => {
               <Stack.Screen
                 name="Home"
                 component={Home}
+                options={{
+                  header: (props) => <CustomHeader {...props} />,
+                }}
+              />
+              <Stack.Screen
+                name="Analytics"
+                component={Analytics}
                 options={{
                   header: (props) => <CustomHeader {...props} />,
                 }}
