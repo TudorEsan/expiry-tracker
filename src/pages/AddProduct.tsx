@@ -10,6 +10,7 @@ import { db } from "../../firebase.config";
 import { collection } from "firebase/firestore";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {
+  Center,
   ChevronDownIcon,
   Icon,
   Input,
@@ -80,9 +81,11 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text size="2xl" bold>
-        Add Item
-      </Text>
+      <Center>
+        <Text size="2xl" bold>
+          Add Item
+        </Text>
+      </Center>
       <Input variant="rounded" size="md">
         <InputField
           value={prodName}
