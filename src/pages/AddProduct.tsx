@@ -40,6 +40,7 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
   const [prodExpiryDate, setProdExpiryDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [value, setValue] = React.useState<string>("0");
+  console.log(prodCategory);
 
   const categories = [
     { label: "Electronics", value: "electronics" },
@@ -63,6 +64,7 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
   };
 
   const addProduct = async () => {
+    console.log(prodCategory);
     await addDoc(collection(db, "products"), {
       name: prodName,
       category: prodCategory,
@@ -105,7 +107,7 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
         />
       </Input>
 
-      <Select>
+      <Select onValueChange={(arg) => setProdCategory(arg)}>
         <SelectTrigger variant="rounded" size="md">
           <SelectInput placeholder="Select option" />
           {/* @ts-ignore */}
