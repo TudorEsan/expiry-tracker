@@ -16,6 +16,7 @@ import withAuthProtection from "../hocs/withAuthProtection";
 import { collection, doc, onSnapshot } from "firebase/firestore";
 import { NOTIFY_BEFORE } from "../config";
 import { Alert } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // import PushNotification from "react-native-push-notification";
 
@@ -47,20 +48,23 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     //   requestPermissions: Platform.OS === "ios",
     // });
 
-    const unsubscribe = onSnapshot(collection(db, "products"), (snapshot) => {
-      const productsList = snapshot.docs
-        .map((doc) => {
-          const data = doc.data();
-          return {
-            ...data,
-            expiry_date: new Date(data.expiry_date),
-          };
-        })
-        // @ts-ignore
-        .sort((a, b) => a.expiry_date - b.expiry_date);
-      checkForExpiringProducts(productsList);
-      setProducts(productsList);
-    });
+    const unsubscribe = onSnapshot(
+      collection(db, "products"),
+      async (snapshot) => {
+        const productsList = snapshot.docs
+          .map((doc) => {
+            const data = doc.data();
+            return {
+              ...data,
+              expiry_date: new Date(data.expiry_date),
+            };
+          })
+          // @ts-ignore
+          .sort((a, b) => a.expiry_date - b.expiry_date);
+        await checkForExpiringProducts(productsList);
+        setProducts(productsList);
+      }
+    );
 
     // const checkProducts = () => {
     //   products.forEach((product) => {
@@ -83,13 +87,45 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     };
   }, []);
 
-  const checkForExpiringProducts = (productsList: any[]) => {
-    const now = new Date().getTime();
-    productsList.forEach((product) => {
-      if (product.expiry_date - now <= NOTIFY_BEFORE) {
-        Alert.alert("Expiration Alert", `${product.name} is expiring soon!`);
+  const storeExpiredProductId = async (id: string) => {
+    try {
+      const expiredProducts = await AsyncStorage.getItem("expiredProducts");
+      const expiredIds = expiredProducts ? JSON.parse(expiredProducts) : [];
+      if (!expiredIds.includes(id)) {
+        expiredIds.push(id);
+        await AsyncStorage.setItem(
+          "expiredProducts",
+          JSON.stringify(expiredIds)
+        );
       }
-    });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const isProductAlreadyNotified = async (id: string) => {
+    try {
+      const expiredProducts = await AsyncStorage.getItem("expiredProducts");
+      const expiredIds = expiredProducts ? JSON.parse(expiredProducts) : [];
+      return expiredIds.includes(id);
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
+  };
+
+  const checkForExpiringProducts = async (productsList: any[]) => {
+    const now = new Date().getTime();
+    for (const product of productsList) {
+      console.log(product)
+      if (
+        product.expiry_date - now <= NOTIFY_BEFORE &&
+        !(await isProductAlreadyNotified(product.id))
+      ) {
+        Alert.alert("Expiration Alert", `${product.name} is expiring soon!`);
+        await storeExpiredProductId(product.id);
+      }
+    }
   };
 
   const isExpiringSoon = (date: Date) => {
