@@ -99,12 +99,6 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
           onChange={(e) => {
             setValue(e.nativeEvent.text);
           }}
-          delimiter=","
-          separator="."
-          precision={2}
-          onChangeText={(formattedValue) => {
-            console.log(formattedValue); // $2,310.46
-          }}
         />
       </Input>
 
