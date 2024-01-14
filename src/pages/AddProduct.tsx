@@ -1,15 +1,34 @@
 import { addDoc } from "firebase/firestore";
 import React, { useState } from "react";
-import { View, Alert, StyleSheet, Text, Platform } from "react-native";
-import { Input, Button } from "react-native-elements";
+import { View, Alert, StyleSheet, Platform } from "react-native";
+import { Button } from "react-native-elements";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
 import RNPickerSelect from "react-native-picker-select";
-
-
+import CurrencyInput from "react-native-currency-input";
 
 import { db } from "../../firebase.config";
 import { collection } from "firebase/firestore";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import {
+  Center,
+  ChevronDownIcon,
+  Icon,
+  Input,
+  InputField,
+  InputIcon,
+  InputSlot,
+  Select,
+  SelectBackdrop,
+  SelectContent,
+  SelectDragIndicator,
+  SelectDragIndicatorWrapper,
+  SelectIcon,
+  SelectInput,
+  SelectItem,
+  SelectPortal,
+  SelectTrigger,
+  Text,
+} from "@gluestack-ui/themed";
 
 interface Props {
   navigation: NavigationProp<ParamListBase>;
@@ -20,6 +39,8 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
   const [prodCategory, setProdCategory] = useState<string>("");
   const [prodExpiryDate, setProdExpiryDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [value, setValue] = React.useState<string>("0");
+  console.log(prodCategory);
 
   const categories = [
     { label: "Electronics", value: "electronics" },
@@ -43,10 +64,13 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
   };
 
   const addProduct = async () => {
+    console.log(prodCategory);
     await addDoc(collection(db, "products"), {
       name: prodName,
       category: prodCategory,
       expiry_date: prodExpiryDate.toUTCString(),
+      id: Math.random().toString(36).substr(2, 9),
+      value,
     })
       .then((ref) => {
         console.log(ref.id);
@@ -60,19 +84,57 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Input
-        placeholder="Name"
-        value={prodName}
-        onChangeText={setProdName}
-        inputContainerStyle={{ borderBottomWidth: 0 }} // Hide underline
-        style={styles.input}
-      />
-      <RNPickerSelect
-        onValueChange={(value) => setProdCategory(value)}
-        items={categories}
-        placeholder={{ label: "Select a category", value: null }}
-        style={pickerSelectStyles}
-      />
+      <Center>
+        <Text size="2xl" bold>
+          Add Item
+        </Text>
+      </Center>
+      <Input variant="rounded" size="md">
+        <InputField
+          value={prodName}
+          onChange={(e) => setProdName(e.nativeEvent.text)}
+          placeholder="Product Name"
+        />
+      </Input>
+
+      <Input variant="rounded">
+        <InputField
+          placeholder="Value"
+          value={value}
+          // type="number"
+          onChange={(e) => {
+            setValue(e.nativeEvent.text);
+          }}
+        />
+      </Input>
+
+      <Select onValueChange={(arg) => setProdCategory(arg)}>
+        <SelectTrigger variant="rounded" size="md">
+          <SelectInput placeholder="Select option" />
+          {/* @ts-ignore */}
+          <SelectIcon mr="$3">
+            <Icon as={ChevronDownIcon} />
+          </SelectIcon>
+        </SelectTrigger>
+        <SelectPortal>
+          <SelectBackdrop />
+          <SelectContent>
+            <SelectDragIndicatorWrapper>
+              <SelectDragIndicator />
+            </SelectDragIndicatorWrapper>
+            {/* <SelectItem label="UX Research" value="ux" /> */}
+            {categories.map((category, index) => {
+              return (
+                <SelectItem
+                  key={index}
+                  label={category.label}
+                  value={category.value}
+                />
+              );
+            })}
+          </SelectContent>
+        </SelectPortal>
+      </Select>
 
       <Text>{prodExpiryDate.toLocaleDateString()}</Text>
       <Button title="Select Date" onPress={showDatepicker} />
@@ -99,7 +161,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
+    // alignItems: "center",
+    gap: 10,
     backgroundColor: "#f2f2f2",
     paddingHorizontal: 15,
   },
@@ -125,9 +188,11 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
+    margin: "auto",
   },
   loginButtonText: {
-    marginRight: 80,
+    // marginRight: 80,
+    margin: "auto",
   },
   signupButton: {
     backgroundColor: "transparent",
@@ -141,7 +206,7 @@ const styles = StyleSheet.create({
     color: "black",
     marginRight: 25,
   },
-})
+});
 
 const pickerSelectStyles = StyleSheet.create({
   inputIOS: {
@@ -149,9 +214,9 @@ const pickerSelectStyles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 10,
     borderWidth: 1,
-    borderColor: 'gray',
+    borderColor: "gray",
     borderRadius: 4,
-    color: 'black',
+    color: "black",
     paddingRight: 30, // to ensure the text is never behind the icon
     marginVertical: 10,
     width: "100%",
@@ -161,9 +226,9 @@ const pickerSelectStyles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderWidth: 0.5,
-    borderColor: 'purple',
+    borderColor: "purple",
     borderRadius: 8,
-    color: 'black',
+    color: "black",
     paddingRight: 30, // to ensure the text is never behind the icon
     marginVertical: 10,
     width: "100%",
