@@ -60,9 +60,12 @@ const EditProduct: React.FC<Props> = ({ route, navigation }) => {
   };
 
   const editProduct = async () => {
-    const productRef = doc(collection(db, "products"), selectedProduct.uid);
-    console.log(selectedProduct)
-    await updateDoc(productRef, {category: selectedProduct.category, expiry_date: selectedProduct.expiry_date.toUTCString(), name: selectedProduct.name})
+    const productRef = doc(collection(db, "products"), selectedProduct.id);
+    await updateDoc(productRef, {category: prodCategory, 
+                                 expiry_date: prodExpiryDate.toUTCString(), 
+                                 name: prodName,
+                                 value: value,
+                                 })
       .then(() => {
         Alert.alert(selectedProduct.name + " updated successfully!");
         navigation.navigate("Home");
