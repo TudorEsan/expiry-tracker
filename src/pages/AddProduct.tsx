@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { View, Alert, StyleSheet, Platform } from "react-native";
 import { Button } from "react-native-elements";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
-import RNPickerSelect from "react-native-picker-select";
 import CurrencyInput from "react-native-currency-input";
 
 import { db } from "../../firebase.config";

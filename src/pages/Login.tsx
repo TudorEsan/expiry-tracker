@@ -70,8 +70,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#f2f2f2", 
     paddingHorizontal: 15,
-   
-   
   },
   labelContainer: {
     marginBottom: 100, // Adjust spacing between label and inputs
@@ -87,18 +85,19 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 25,
     paddingHorizontal: 20,
-    
   },
   loginButton: {
     backgroundColor: "black",
     marginTop: 50,
     width: "100%",
-    borderRadius: 25, 
+    borderRadius: 25,
     justifyContent: "center",
-    alignItems:"center",
+    alignItems: "center",
+    margin: "auto",
   },
   loginButtonText: {
-    marginRight:100,
+    // marginRight: 80,
+    margin: "auto",
   },
   signupButton: {
     backgroundColor: "transparent",
