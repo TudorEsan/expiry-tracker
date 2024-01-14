@@ -80,7 +80,6 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: "bold",
     color: "#333", // Adjust color if needed
-  
   },
   input: {
     marginVertical: 1,
@@ -91,18 +90,15 @@ const styles = StyleSheet.create({
     
   },
   loginButton: {
-
     backgroundColor: "black",
     marginTop: 50,
     width: "100%",
     borderRadius: 25, 
     justifyContent: "center",
     alignItems:"center",
-    
   },
   loginButtonText: {
     marginRight:100,
-   
   },
   signupButton: {
     backgroundColor: "transparent",
@@ -111,7 +107,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "black",
-    
   },
   signupText: {
     color: "black",

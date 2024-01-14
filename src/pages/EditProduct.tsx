@@ -1,4 +1,4 @@
-import { addDoc } from "firebase/firestore";
+import { addDoc, doc, updateDoc } from "firebase/firestore";
 import React, { useState } from "react";
 import { View, Alert, StyleSheet, Text, Platform } from "react-native";
 import { Input, Button } from "react-native-elements";
@@ -13,12 +13,14 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 
 interface Props {
   navigation: NavigationProp<ParamListBase>;
+  route: any;
 }
 
-const AddProduct: React.FC<Props> = ({ navigation }) => {
-  const [prodName, setProdName] = useState<string>("");
-  const [prodCategory, setProdCategory] = useState<string>("");
-  const [prodExpiryDate, setProdExpiryDate] = useState(new Date());
+const EditProduct: React.FC<Props> = ({ route, navigation }) => {
+  const selectedProduct = route.params.selectedProduct;
+  const [prodName, setProdName] = useState<string>(selectedProduct.name);
+  const [prodCategory, setProdCategory] = useState<string>(selectedProduct.category);
+  const [prodExpiryDate, setProdExpiryDate] = useState(new Date(selectedProduct.expiry_date.toUTCString()));
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const categories = [
@@ -42,15 +44,12 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
     setShowDatePicker(true);
   };
 
-  const addProduct = async () => {
-    await addDoc(collection(db, "products"), {
-      name: prodName,
-      category: prodCategory,
-      expiry_date: prodExpiryDate.toUTCString(),
-    })
-      .then((ref) => {
-        console.log(ref.id);
-        Alert.alert("Product added successfully!");
+  const editProduct = async () => {
+    const productRef = doc(collection(db, "products"), selectedProduct.uid);
+    console.log(selectedProduct)
+    await updateDoc(productRef, {category: selectedProduct.category, expiry_date: selectedProduct.expiry_date.toUTCString(), name: selectedProduct.name})
+      .then(() => {
+        Alert.alert(selectedProduct.name + " updated successfully!");
         navigation.navigate("Home");
       })
       .catch((error) => {
@@ -62,6 +61,7 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
     <View style={styles.container}>
       <Input
         placeholder="Name"
+        defaultValue={prodName}
         value={prodName}
         onChangeText={setProdName}
         inputContainerStyle={{ borderBottomWidth: 0 }} // Hide underline
@@ -86,8 +86,8 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
         />
       )}
       <Button
-        title="Add Product"
-        onPress={addProduct}
+        title="Edit Product"
+        onPress={editProduct}
         buttonStyle={styles.loginButton}
         titleStyle={styles.loginButtonText} // Center text horizontally
       />
@@ -170,4 +170,4 @@ const pickerSelectStyles = StyleSheet.create({
   },
 });
 
-export default AddProduct;
+export default EditProduct;

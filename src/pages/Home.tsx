@@ -14,7 +14,7 @@ import { NavigationProp, ParamListBase } from "@react-navigation/native";
 import { signOut } from "firebase/auth";
 import { auth, firebase, db } from "../../firebase.config";
 import withAuthProtection from "../hocs/withAuthProtection";
-import { collection, deleteDoc, doc, getDocs, onSnapshot, query, where } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, onSnapshot, query, updateDoc, where } from "firebase/firestore";
 import { NOTIFY_BEFORE } from "../config";
 import { Alert } from "react-native";
 
@@ -51,20 +51,29 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   };
   
   const deleteProduct = async (product: any) => {
-    const querySnapshot = await getDocs(
-      query(collection(db, "products"), where("name", '==', product.name))
-    );
-    
-    if (!querySnapshot.empty) {
-      const docRef = querySnapshot.docs[0].ref;
-      await deleteDoc(docRef)
-        .then(() => {
-          Alert.alert(product.name + " deleted successfully!");
-        })
-        .catch((error) => {
-          Alert.alert("Error:", error.message);
-        });
-    }
+    const productRef = doc(collection(db, "products"), product.uid);
+    await deleteDoc(productRef)
+      .then(() => {
+        Alert.alert(product.name + " deleted successfully!");
+      })
+      .catch((error) => {
+        Alert.alert("Error:", error.message);
+      });
+      closeModal();
+  };
+  
+  const editProduct = async (product: any) => {
+    const productRef = doc(collection(db, "products"), product.uid);
+    product.name = "A";
+    console.log(product)
+    await updateDoc(productRef, {category: product.category, expiry_date: product.expiry_date.toUTCString(), name: product.name})
+      .then(() => {
+        Alert.alert(product.name + " updated successfully!");
+      })
+      .catch((error) => {
+        Alert.alert("Error:", error.message);
+      });
+      closeModal();
   };
 
   useEffect(() => {
@@ -83,6 +92,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
           return {
             ...data,
             expiry_date: new Date(data.expiry_date),
+            uid: doc.id
           };
         })
         // @ts-ignore
@@ -161,9 +171,11 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
           <View style={styles.modalView}>
             <Text>{selectedProduct?.name}</Text>
             {/* <Button title="Edit" onPress={closeModal} /> */}
-            {/* <Button title="Delete" onPress={deleteProduct(selectedProduct)} /> */}
             <TouchableOpacity onPress={() => deleteProduct(selectedProduct)}>
               <Text>Delete</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("EditProduct", {selectedProduct})}>
+              <Text>Edit</Text>
             </TouchableOpacity>
             <Button title="Close" onPress={closeModal} />
           </View>
