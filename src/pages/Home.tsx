@@ -67,6 +67,8 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     const archived: any[] = [];
 
     for (const product of products) {
+      if (product.uid == auth.currentUser?.uid)
+      {
       switch (product.status) {
         case "expired":
           expired.push(product);
@@ -78,10 +80,11 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
           active.push(product);
       }
     }
+    }
 
     return { expired, active, archived };
   };
-  
+
   useEffect(() => {
     const unsubscribe = onSnapshot(
       collection(db, "products"),
@@ -286,7 +289,7 @@ const styles = StyleSheet.create({
     marginBottom: "5%",
   },
   addProductButtonText: {
-    fontSize: 30,
+    fontSize: 20,
     color: "white",
   },
   productContainer: {
