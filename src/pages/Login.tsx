@@ -19,7 +19,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
     signInWithEmailAndPassword(auth, email, password)
       .then(() => {
         Alert.alert("Logged in successfully!");
-        navigation.navigate('Home');
+        navigation.navigate("Home");
       })
       .catch((error) => {
         Alert.alert("Error:", error.message);

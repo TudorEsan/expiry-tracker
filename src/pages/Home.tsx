@@ -53,7 +53,6 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   };
   const [products, setProducts] = useState<any[]>([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
   const [expired, setExpired] = useState<any[]>([]);
   const [active, setActive] = useState<any[]>([]);
   const [archived, setArchived] = useState<any[]>([]);
@@ -82,42 +81,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
     return { expired, active, archived };
   };
-
-  const handleProductClick = (product: any) => {
-    setSelectedProduct(product);
-    setModalVisible(true);
-  };
-
-  const closeModal = () => {
-    setModalVisible(false);
-  };
   
-  const deleteProduct = async (product: any) => {
-    const productRef = doc(collection(db, "products"), product.uid);
-    await deleteDoc(productRef)
-      .then(() => {
-        Alert.alert(product.name + " deleted successfully!");
-      })
-      .catch((error) => {
-        Alert.alert("Error:", error.message);
-      });
-      closeModal();
-  };
-  
-  const editProduct = async (product: any) => {
-    const productRef = doc(collection(db, "products"), product.uid);
-    product.name = "A";
-    console.log(product)
-    await updateDoc(productRef, {category: product.category, expiry_date: product.expiry_date.toUTCString(), name: product.name})
-      .then(() => {
-        Alert.alert(product.name + " updated successfully!");
-      })
-      .catch((error) => {
-        Alert.alert("Error:", error.message);
-      });
-      closeModal();
-  };
-
   useEffect(() => {
     const unsubscribe = onSnapshot(
       collection(db, "products"),
@@ -319,8 +283,8 @@ const styles = StyleSheet.create({
     backgroundColor: "black",
     alignItems: "center",
     justifyContent: "center",
+    marginBottom: "5%",
   },
-
   addProductButtonText: {
     fontSize: 30,
     color: "white",
