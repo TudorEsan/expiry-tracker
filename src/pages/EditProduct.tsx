@@ -1,10 +1,8 @@
-import { addDoc } from "firebase/firestore";
+import { doc, updateDoc } from "firebase/firestore";
 import React, { useState } from "react";
 import { View, Alert, StyleSheet, Platform } from "react-native";
 import { Button } from "react-native-elements";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
-import CurrencyInput from "react-native-currency-input";
-
 import { db } from "../../firebase.config";
 import { collection } from "firebase/firestore";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -14,8 +12,6 @@ import {
   Icon,
   Input,
   InputField,
-  InputIcon,
-  InputSlot,
   Select,
   SelectBackdrop,
   SelectContent,
@@ -31,15 +27,16 @@ import {
 
 interface Props {
   navigation: NavigationProp<ParamListBase>;
+  route: any;
 }
 
-const AddProduct: React.FC<Props> = ({ navigation }) => {
-  const [prodName, setProdName] = useState<string>("");
-  const [prodCategory, setProdCategory] = useState<string>("");
-  const [prodExpiryDate, setProdExpiryDate] = useState(new Date());
+const EditProduct: React.FC<Props> = ({ route, navigation }) => {
+  const selectedProduct = route.params.qaItem;
+  const [prodName, setProdName] = useState<string>(selectedProduct.name);
+  const [prodCategory, setProdCategory] = useState<string>(selectedProduct.category);
+  const [prodExpiryDate, setProdExpiryDate] = useState(new Date(selectedProduct.expiry_date.toUTCString()));
+  const [value, setValue] = React.useState<string>(selectedProduct.value);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [value, setValue] = React.useState<string>("0");
-  console.log(prodCategory);
 
   const categories = [
     { label: "Electronics", value: "electronics" },
@@ -62,18 +59,12 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
     setShowDatePicker(true);
   };
 
-  const addProduct = async () => {
-    console.log(prodCategory);
-    await addDoc(collection(db, "products"), {
-      name: prodName,
-      category: prodCategory,
-      expiry_date: prodExpiryDate.toUTCString(),
-      id: Math.random().toString(36).substr(2, 9),
-      value,
-    })
-      .then((ref) => {
-        console.log(ref.id);
-        Alert.alert("Product added successfully!");
+  const editProduct = async () => {
+    const productRef = doc(collection(db, "products"), selectedProduct.uid);
+    console.log(selectedProduct)
+    await updateDoc(productRef, {category: selectedProduct.category, expiry_date: selectedProduct.expiry_date.toUTCString(), name: selectedProduct.name})
+      .then(() => {
+        Alert.alert(selectedProduct.name + " updated successfully!");
         navigation.navigate("Home");
       })
       .catch((error) => {
@@ -85,7 +76,7 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
     <View style={styles.container}>
       <Center>
         <Text size="2xl" bold>
-          Add Item
+          Edit Item
         </Text>
       </Center>
       <Input variant="rounded" size="md">
@@ -109,7 +100,7 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
 
       <Select onValueChange={(arg) => setProdCategory(arg)}>
         <SelectTrigger variant="rounded" size="md">
-          <SelectInput placeholder="Select option" />
+          <SelectInput placeholder="Select option" value={prodCategory}/>
           {/* @ts-ignore */}
           <SelectIcon mr="$3">
             <Icon as={ChevronDownIcon} />
@@ -147,8 +138,8 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
         />
       )}
       <Button
-        title="Add Product"
-        onPress={addProduct}
+        title="Edit Product"
+        onPress={editProduct}
         buttonStyle={styles.loginButton}
         titleStyle={styles.loginButtonText} // Center text horizontally
       />
@@ -205,7 +196,7 @@ const styles = StyleSheet.create({
     color: "black",
     marginRight: 25,
   },
-});
+})
 
 const pickerSelectStyles = StyleSheet.create({
   inputIOS: {
@@ -213,9 +204,9 @@ const pickerSelectStyles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 10,
     borderWidth: 1,
-    borderColor: "gray",
+    borderColor: 'gray',
     borderRadius: 4,
-    color: "black",
+    color: 'black',
     paddingRight: 30, // to ensure the text is never behind the icon
     marginVertical: 10,
     width: "100%",
@@ -225,13 +216,13 @@ const pickerSelectStyles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderWidth: 0.5,
-    borderColor: "purple",
+    borderColor: 'purple',
     borderRadius: 8,
-    color: "black",
+    color: 'black',
     paddingRight: 30, // to ensure the text is never behind the icon
     marginVertical: 10,
     width: "100%",
   },
 });
 
-export default AddProduct;
+export default EditProduct;

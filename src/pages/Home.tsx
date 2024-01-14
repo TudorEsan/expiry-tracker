@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Platform,
+  Modal,
   Pressable,
 } from "react-native";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
@@ -51,6 +52,8 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     navigation.navigate("AddProduct");
   };
   const [products, setProducts] = useState<any[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
   const [expired, setExpired] = useState<any[]>([]);
   const [active, setActive] = useState<any[]>([]);
   const [archived, setArchived] = useState<any[]>([]);
@@ -78,6 +81,41 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     }
 
     return { expired, active, archived };
+  };
+
+  const handleProductClick = (product: any) => {
+    setSelectedProduct(product);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+  
+  const deleteProduct = async (product: any) => {
+    const productRef = doc(collection(db, "products"), product.uid);
+    await deleteDoc(productRef)
+      .then(() => {
+        Alert.alert(product.name + " deleted successfully!");
+      })
+      .catch((error) => {
+        Alert.alert("Error:", error.message);
+      });
+      closeModal();
+  };
+  
+  const editProduct = async (product: any) => {
+    const productRef = doc(collection(db, "products"), product.uid);
+    product.name = "A";
+    console.log(product)
+    await updateDoc(productRef, {category: product.category, expiry_date: product.expiry_date.toUTCString(), name: product.name})
+      .then(() => {
+        Alert.alert(product.name + " updated successfully!");
+      })
+      .catch((error) => {
+        Alert.alert("Error:", error.message);
+      });
+      closeModal();
   };
 
   useEffect(() => {
@@ -166,7 +204,6 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     const now = new Date();
     return date.getTime() - now.getTime() <= NOTIFY_BEFORE;
   };
-
   const QuickActions = (index: number, qaItem: any) => {
     return (
       <View style={styles.qaContainer}>
@@ -177,6 +214,15 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
             }}
           >
             <Text>Used</Text>
+          </Pressable>
+        </View>
+        <View style={[styles.button]}>
+          <Pressable
+            onPress={() => {
+              navigation.navigate("EditProduct", {qaItem});
+            }}
+          >
+            <Text>Edit</Text>
           </Pressable>
         </View>
         <View style={[styles.button]}>
@@ -235,7 +281,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
               </View>
             );
           }}
-          maxSwipeDistance={240}
+          maxSwipeDistance={275}
           renderQuickActions={({ index, item }: any) =>
             QuickActions(index, item)
           }
@@ -312,8 +358,26 @@ const styles = StyleSheet.create({
   expiringSoon: {
     color: "red",
   },
-  container: {
-    backgroundColor: "#121212",
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   headerContainer: {
     height: 80,
@@ -382,7 +446,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   button: {
-    width: 80,
+    width: 60,
     alignItems: "center",
     justifyContent: "center",
   },

@@ -11,6 +11,7 @@ import RegisterScreen from "./src/pages/Register";
 import LoadingScreen from "./src/pages/LoadingScreen";
 import useAuth from "./src/hooks/useAuth";
 import AddProduct from "./src/pages/AddProduct";
+import EditProduct from './src/pages/EditProduct';
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
 import CustomHeader from "./src/pages/CustomHeader";
 import { registerRootComponent } from "expo";
@@ -23,6 +24,7 @@ export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
   AddProduct: undefined;
+  EditProduct: undefined;
   Analytics: undefined;
 };
 
@@ -64,6 +66,13 @@ const App: React.FC = () => {
                 options={{
                   header: (props) => <CustomHeader {...props} />,
                 }}
+              />
+              <Stack.Screen 
+                name="EditProduct" 
+                component={EditProduct}
+                options={{
+                  header: (props) => <CustomHeader {...props} />,
+                }} 
               />
             </React.Fragment>
           ) : (
