@@ -36,10 +36,10 @@ interface Props {
 const AddProduct: React.FC<Props> = ({ navigation }) => {
   const [prodName, setProdName] = useState<string>("");
   const [prodCategory, setProdCategory] = useState<string>("");
+  const [prodStatus, setProdStatus] = useState<string>("active");
   const [prodExpiryDate, setProdExpiryDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [value, setValue] = React.useState<string>("0");
-  console.log(prodCategory);
+  const [prodValue, setProdValue] = React.useState<string>("0");
 
   const categories = [
     { label: "Electronics", value: "electronics" },
@@ -68,12 +68,15 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
       name: prodName,
       category: prodCategory,
       expiry_date: prodExpiryDate.toUTCString(),
+      status: prodStatus,
+      value: prodValue,
       id: Math.random().toString(36).substr(2, 9),
-      value,
     })
       .then((ref) => {
         console.log(ref.id);
-        Alert.alert("Product added successfully!");
+        Alert.alert(prodName, " successfully added!", [
+          { text: "OK", onPress: () => navigation.navigate("Home") }
+        ]);
         navigation.navigate("Home");
       })
       .catch((error) => {
@@ -99,10 +102,10 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
       <Input variant="rounded">
         <InputField
           placeholder="Value"
-          value={value}
+          value={prodValue}
           // type="number"
           onChange={(e) => {
-            setValue(e.nativeEvent.text);
+            setProdValue(e.nativeEvent.text);
           }}
         />
       </Input>

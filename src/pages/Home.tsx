@@ -7,6 +7,7 @@ import {
   Platform,
   Modal,
   Pressable,
+  ScrollView,
 } from "react-native";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
 import SwipeableFlatList from "react-native-swipeable-list";
@@ -21,12 +22,20 @@ import {
   onSnapshot,
   updateDoc,
 } from "firebase/firestore";
+import {
+  Menu,
+  MenuProvider,
+  MenuOptions,
+  MenuOption,
+  MenuTrigger,
+ } from "react-native-popup-menu";
 import { NOTIFY_BEFORE } from "../config";
 import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Button, Center, Divider, HStack } from "@gluestack-ui/themed";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "@gluestack-ui/themed";
+
 const darkColors = {
   background: "#121212",
   primary: "#BB86FC",
@@ -138,18 +147,19 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    const toDelete = doc(db, "products", id);
-    console.log("deleting", doc);
-    await deleteDoc(toDelete);
-  };
-
   const checkForExpiringProducts = async (productsList: any[]) => {
-    const now = new Date().getTime();
+    console.log("-----------------------------------------------");
     for (const product of productsList) {
       console.log(product);
       if (
-        product.expiry_date - now <= NOTIFY_BEFORE &&
+        isExpired(product) &&
+        !(await isProductAlreadyNotified(product.id))
+      ) {
+        Alert.alert("Expiration Alert", `${product.name} has expired!`);
+        await storeExpiredProductId(product.id);
+      }
+      else if (
+        isExpiringSoon(product) &&
         !(await isProductAlreadyNotified(product.id))
       ) {
         Alert.alert("Expiration Alert", `${product.name} is expiring soon!`);
@@ -160,14 +170,28 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
   const updateStatus = async (id: string, status: string) => {
     const toUpdate = doc(db, "products", id);
-    console.log("updating status", doc);
     await updateDoc(toUpdate, { status });
   };
 
-  const isExpiringSoon = (date: Date) => {
+  const isExpired = (product: any) => {
     const now = new Date();
-    return date.getTime() - now.getTime() <= NOTIFY_BEFORE;
+    return product.expiry_date < now.getTime();
   };
+
+  const isExpiringSoon = (product: any) => {
+    const now = new Date();
+    return product.expiry_date - now.getTime() <= NOTIFY_BEFORE;
+  };
+
+  const handleDelete = async (id: string) => {
+    const toDelete = doc(db, "products", id);
+    await deleteDoc(toDelete);
+  };
+
+  const handleFilterButtonPress = () => {
+    throw new Error("Function not implemented.");
+  }
+
   const QuickActions = (index: number, qaItem: any) => {
     return (
       <View style={styles.qaContainer}>
@@ -214,18 +238,33 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <View>
       <SafeAreaView>
-        <Center>
-          <Text size="2xl" bold>
-            Active Items
-          </Text>
-        </Center>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomWidth: 2 }}>
+      {/* Left container for the title */}
+      <Text size="2xl" bold style={{marginLeft: "5%"}}>
+        Active Items
+      </Text>
+
+      {/* Right container for TouchableOpacity */}
+      <MenuProvider style={{width: 35}}>
+     <Menu>
+       <MenuTrigger
+         text="Filter"
+       />
+       <MenuOptions>
+         <MenuOption onSelect={() => alert(`Delete`)} text="Delete" />
+         <MenuOption onSelect={() => alert(`Delete`)} text="Delete" />
+         <MenuOption onSelect={() => alert(`Delete`)} text="Delete" />
+       </MenuOptions>
+     </Menu>
+   </MenuProvider>
+    </View>
         <SwipeableFlatList
+          height="76.5%"
           keyExtractor={extractItemKey}
           data={active}
           renderItem={({ item }: any) => {
-            console.log(item);
             const formattedDate = item.expiry_date.toLocaleDateString();
-            const expiringSoon = isExpiringSoon(item.expiry_date);
+            const expiringSoon = isExpiringSoon(item);
 
             return (
               // <Text>{item.name}</Text>
@@ -245,7 +284,8 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
               </View>
             );
           }}
-          maxSwipeDistance={275}
+          maxSwipeDistance={240}
+          speed
           renderQuickActions={({ index, item }: any) =>
             QuickActions(index, item)
           }
@@ -283,11 +323,13 @@ const styles = StyleSheet.create({
     backgroundColor: "black",
     alignItems: "center",
     justifyContent: "center",
+    marginTop: "5%",
     marginBottom: "5%",
   },
   addProductButtonText: {
     fontSize: 30,
     color: "white",
+    paddingTop: "25%",
   },
   productContainer: {
     flexDirection: "row",
@@ -299,6 +341,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     // marginBottom: 10,
     width: "100%",
+    height: 70,
     paddingLeft: 10,
     paddingRight: 10,
   },
