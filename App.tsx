@@ -18,6 +18,7 @@ import { registerRootComponent } from "expo";
 import { config } from "@gluestack-ui/config";
 import { GluestackUIProvider } from "@gluestack-ui/themed";
 import { Analytics } from "./src/pages/Analytics";
+import {Charts} from "./src/pages/Charts";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -26,6 +27,7 @@ export type RootStackParamList = {
   AddProduct: undefined;
   EditProduct: undefined;
   Analytics: undefined;
+  Charts : undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -56,6 +58,13 @@ const App: React.FC = () => {
               <Stack.Screen
                 name="Analytics"
                 component={Analytics}
+                options={{
+                  header: (props) => <CustomHeader {...props} />,
+                }}
+              />
+              <Stack.Screen
+                name="Charts"
+                component={Charts}
                 options={{
                   header: (props) => <CustomHeader {...props} />,
                 }}
