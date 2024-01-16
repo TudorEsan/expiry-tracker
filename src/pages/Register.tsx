@@ -3,8 +3,14 @@ import { View, Alert, StyleSheet,Text } from "react-native";
 import { Input, Button } from 'react-native-elements';
 import { auth } from "../../firebase.config";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { NavigationProp , ParamListBase } from "@react-navigation/native";
 
-const RegisterScreen = ({ navigation }) => {
+interface Props {
+  navigation: NavigationProp<ParamListBase>;
+}
+
+
+const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -12,7 +18,7 @@ const RegisterScreen = ({ navigation }) => {
     createUserWithEmailAndPassword(auth, email, password)
       .then(() => {
         Alert.alert("User created successfully!");
-        navigation.navigate("Login");
+        navigation.navigate("Home");
       })
       .catch((error) => {
         Alert.alert("Error:", error.message);

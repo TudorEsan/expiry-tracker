@@ -1,25 +1,28 @@
-import { Center, HStack, Spinner, Text, VStack } from "@gluestack-ui/themed";
+import { Center, HStack, Spinner, Text, VStack, View } from "@gluestack-ui/themed";
 import { collection, onSnapshot } from "firebase/firestore";
 import React, { useEffect } from "react";
-import { db } from "../../firebase.config";
+import { db, auth } from "../../firebase.config";
 import { analyzeProducts } from "../helpers/analytics";
 
+
 export const Analytics = () => {
+  
   const [analytics, setAnalytics] = React.useState<any>(null);
   const [products, setProducts] = React.useState<any>(null);
   useEffect(() => {
-    console.log("test");
     const unsubscribe = onSnapshot(
       collection(db, "products"),
       async (snapshot) => {
+        const currentUserUid = auth.currentUser?.uid;
         const productsList = snapshot.docs.map((doc) => {
           const data = doc.data();
           return {
             ...data,
+            uid: data.uid,
             id: doc.id,
             expiry_date: new Date(data.expiry_date),
           };
-        });
+        }).filter((product) => product.uid === currentUserUid);
         setProducts(productsList);
         try {
           const analytics = analyzeProducts(productsList);
@@ -49,6 +52,7 @@ export const Analytics = () => {
     <VStack>
       <Center>
         <Text size="2xl">Analytics</Text>
+        
         <VStack>
           <Text size="lg">
             Expired Product Count:{" "}
@@ -78,8 +82,10 @@ export const Analytics = () => {
           <Text size="lg">
             All Products Count: {analytics.totalProducts || "N/A"}
           </Text>
-        </VStack>
+        </VStack>       
       </Center>
     </VStack>
+    
   );
 };
+export {  };

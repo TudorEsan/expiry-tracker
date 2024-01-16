@@ -5,7 +5,7 @@ import { Button } from "react-native-elements";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
 import CurrencyInput from "react-native-currency-input";
 
-import { db } from "../../firebase.config";
+import { db, auth } from "../../firebase.config";
 import { collection } from "firebase/firestore";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {
@@ -71,6 +71,7 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
       status: prodStatus,
       value: prodValue,
       id: Math.random().toString(36).substr(2, 9),
+      uid : auth.currentUser?.uid,
     })
       .then((ref) => {
         console.log(ref.id);
