@@ -35,7 +35,7 @@ const EditProduct: React.FC<Props> = ({ route, navigation }) => {
   const [prodName, setProdName] = useState<string>(selectedProduct.name);
   const [prodCategory, setProdCategory] = useState<string>(selectedProduct.category);
   const [prodExpiryDate, setProdExpiryDate] = useState(new Date(selectedProduct.expiry_date.toUTCString()));
-  const [value, setValue] = React.useState<string>(selectedProduct.value);
+  const [prodValue, setProdValue] = React.useState<string>(selectedProduct.value);
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const categories = [
@@ -63,7 +63,7 @@ const EditProduct: React.FC<Props> = ({ route, navigation }) => {
     await updateDoc(productRef, {category: prodCategory, 
                                  expiry_date: prodExpiryDate.toUTCString(), 
                                  name: prodName,
-                                 value: value,
+                                 value: prodValue,
                                  })
       .then(() => {
         Alert.alert(selectedProduct.name + " updated successfully!");
@@ -92,14 +92,14 @@ const EditProduct: React.FC<Props> = ({ route, navigation }) => {
       <Input variant="rounded">
   <InputField
     placeholder="Value"
-    value={value}
+    value={prodValue}
     onChange={(e) => {
       const inputValue = e.nativeEvent.text;
       const numericValue = parseFloat(inputValue);
-      if (!isNaN(numericValue) && numericValue > 0) {
-        setValue(numericValue.toString()); 
+      if (!isNaN(numericValue) && numericValue >= 0) {
+        setProdValue(numericValue.toString()); 
       } else {
-        setValue(""); 
+        setProdValue(""); 
       }
     }}
   />
