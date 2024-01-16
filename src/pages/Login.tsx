@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-import { View, Alert, StyleSheet,Text  } from "react-native";
-import { Input, Button } from 'react-native-elements';
+import React, { useState, useEffect } from "react";
+import { View, Alert, StyleSheet, Text } from "react-native";
+import { Input, Button, CheckBox } from 'react-native-elements';
 import { auth } from "../../firebase.config";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../App";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
@@ -14,21 +15,55 @@ interface Props {
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
 
-  const handleLogin = () => {
-    signInWithEmailAndPassword(auth, email, password)
-      .then(() => {
-        Alert.alert("Logged in successfully!");
-        navigation.navigate("Home");
-      })
-      .catch((error) => {
-        Alert.alert("Error:", error.message);
-      });
+  // Load stored credentials on component mount
+  useEffect(() => {
+    loadStoredCredentials();
+  }, []);
+
+  const loadStoredCredentials = async () => {
+    try {
+      const storedEmail = await AsyncStorage.getItem('storedEmail');
+      const storedPassword = await AsyncStorage.getItem('storedPassword');
+      const storedRememberMe = await AsyncStorage.getItem('storedRememberMe');
+
+      if (storedRememberMe === 'true' && storedEmail && storedPassword) {
+        setEmail(storedEmail);
+        setPassword(storedPassword);
+        setRememberMe(true);
+      }
+    } catch (error) {
+      console.error('Error loading stored credentials:', error);
+    }
+  };
+
+  const handleLogin = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+
+      // Save credentials if "Remember Me" is checked
+      if (rememberMe) {
+        await AsyncStorage.setItem('storedEmail', email);
+        await AsyncStorage.setItem('storedPassword', password);
+        await AsyncStorage.setItem('storedRememberMe', 'true');
+      } else {
+        // Clear stored credentials if "Remember Me" is not checked
+        await AsyncStorage.removeItem('storedEmail');
+        await AsyncStorage.removeItem('storedPassword');
+        await AsyncStorage.removeItem('storedRememberMe');
+      }
+
+      Alert.alert("Logged in successfully!");
+      navigation.navigate("Home");
+    } catch (error) {
+      Alert.alert("Error");
+    }
   };
 
   return (
     <View style={styles.container}>
-     <View style={styles.labelContainer}>
+      <View style={styles.labelContainer}>
         <Text style={styles.expiryLabel}>ExpiryTrack Pro</Text>
       </View>
       <Input
@@ -36,7 +71,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
-        inputContainerStyle={{ borderBottomWidth: 0 }} // Hide underline
+        inputContainerStyle={{ borderBottomWidth: 0 }}
         style={styles.input}
       />
       <Input
@@ -44,15 +79,23 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
         value={password}
         onChangeText={setPassword}
         secureTextEntry
-        inputContainerStyle={{ borderBottomWidth: 0 }} // Hide underline
+        inputContainerStyle={{ borderBottomWidth: 0 }}
         style={styles.input}
       />
-      <Button
-          title="Login"
-          onPress={handleLogin}
-          buttonStyle={styles.loginButton}
-          titleStyle={styles.loginButtonText} // Center text horizontally
+      <View style={styles.rememberMeContainer}>
+        <CheckBox
+          title="Remember Me"
+          containerStyle={styles.rememberMeInputContainer}
+          checked={rememberMe}
+          onPress={() => setRememberMe(!rememberMe)}
         />
+      </View>
+      <Button
+        title="Login"
+        onPress={handleLogin}
+        buttonStyle={styles.loginButton}
+        titleStyle={styles.loginButtonText}
+      />
       <Button
         title="Don't have an account? Sign Up"
         onPress={() => navigation.navigate("Register")}
@@ -110,6 +153,17 @@ const styles = StyleSheet.create({
     color: "black",
     marginRight:25,
   },
+  rememberMeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  rememberMeInputContainer: {
+    flex: 1,
+    borderBottomWidth: 0,
+  },
 });
 
 export default LoginScreen;
+
+

@@ -177,7 +177,7 @@ function generateLabels(mostRecentExpiredDate: Date) {
   // Function to get month name based on index
   function getMonthName(monthIndex: number) {
     const months = [
-      "Jun",
+      "Jan",
       "Feb",
       "Mar",
       "Apr",
