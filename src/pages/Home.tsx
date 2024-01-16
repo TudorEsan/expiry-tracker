@@ -152,7 +152,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const checkForExpiringProducts = async (productsList: any[]) => {
     const now = new Date().getTime();
     for (const product of productsList) {
-      console.log("a",product);
+      console.log(product);
       if (
         product.expiry_date - now <= NOTIFY_BEFORE &&
         !(await isProductAlreadyNotified(product.id))
