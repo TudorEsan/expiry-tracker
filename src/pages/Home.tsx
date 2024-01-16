@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
     marginBottom: "5%",
   },
   addProductButtonText: {
-    fontSize: 20,
+    fontSize: 30,
     color: "white",
     paddingTop: "25%",
   },

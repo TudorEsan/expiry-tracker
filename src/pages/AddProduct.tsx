@@ -14,6 +14,8 @@ import {
   Icon,
   Input,
   InputField,
+  InputIcon,
+  InputSlot,
   Select,
   SelectBackdrop,
   SelectContent,
@@ -38,7 +40,7 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
   const [prodExpiryDate, setProdExpiryDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [prodValue, setProdValue] = React.useState<string>("0");
-
+ 
   const categories = [
     { label: "Electronics", value: "electronics" },
     { label: "Books", value: "books" },
@@ -46,6 +48,7 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
     { label: "Home", value: "home" },
     { label: "Food", value: "food" },
   ];
+  // this could be done on the server
 
   const handleDateChange = (event: any, date: any) => {
     setShowDatePicker(Platform.OS === "ios"); // On iOS, DateTimePicker is shown in a modal
@@ -104,14 +107,14 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
     onChange={(e) => {
       const inputValue = e.nativeEvent.text;
       const numericValue = parseFloat(inputValue);
-
+      
       if (!isNaN(numericValue) && numericValue >= 0) {
-        setProdValue(numericValue.toString()); // Ensure that the value is stored as a string
+        setProdValue(numericValue.toString()); // Ensure that the value is stored as a string 
       } else {
         // Set value to an empty string or 0
         setProdValue(""); // for empty string
         // or
-        // setValue("0"); // for 0
+        // setValue("0"); // for 0 
       }
     }}
   />
@@ -133,6 +136,7 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
             <SelectDragIndicatorWrapper>
               <SelectDragIndicator />
             </SelectDragIndicatorWrapper>
+            {/* <SelectItem label="UX Research" value="ux" /> */}
             {categories.map((category, index) => {
               return (
                 <SelectItem
@@ -150,6 +154,7 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
       <Button title="Select Date" onPress={showDatepicker} />
       {showDatePicker && (
         <DateTimePicker
+          
           value={prodExpiryDate}
           mode="date"
           is24Hour={true}
@@ -171,6 +176,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
+    // alignItems: "center",
     gap: 10,
     backgroundColor: "#f2f2f2",
     paddingHorizontal: 15,
@@ -200,6 +206,7 @@ const styles = StyleSheet.create({
     margin: "auto",
   },
   loginButtonText: {
+    // marginRight: 80,
     margin: "auto",
   },
   signupButton: {
