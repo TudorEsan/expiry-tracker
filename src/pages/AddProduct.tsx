@@ -14,8 +14,6 @@ import {
   Icon,
   Input,
   InputField,
-  InputIcon,
-  InputSlot,
   Select,
   SelectBackdrop,
   SelectContent,
@@ -36,10 +34,10 @@ interface Props {
 const AddProduct: React.FC<Props> = ({ navigation }) => {
   const [prodName, setProdName] = useState<string>("");
   const [prodCategory, setProdCategory] = useState<string>("");
+  const [prodStatus, setProdStatus] = useState<string>("active");
   const [prodExpiryDate, setProdExpiryDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [value, setValue] = React.useState<string>("0");
- // console.log(prodCategory);
+  const [prodValue, setProdValue] = React.useState<string>("0");
 
   const categories = [
     { label: "Electronics", value: "electronics" },
@@ -48,7 +46,6 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
     { label: "Home", value: "home" },
     { label: "Food", value: "food" },
   ];
-  // this could be done on the server
 
   const handleDateChange = (event: any, date: any) => {
     setShowDatePicker(Platform.OS === "ios"); // On iOS, DateTimePicker is shown in a modal
@@ -68,13 +65,16 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
       name: prodName,
       category: prodCategory,
       expiry_date: prodExpiryDate.toUTCString(),
+      status: prodStatus,
+      value: prodValue,
       id: Math.random().toString(36).substr(2, 9),
       uid : auth.currentUser?.uid,
-      value,
     })
       .then((ref) => {
         console.log(ref.id);
-        Alert.alert("Product added successfully!");
+        Alert.alert(prodName, " successfully added!", [
+          { text: "OK", onPress: () => navigation.navigate("Home") }
+        ]);
         navigation.navigate("Home");
       })
       .catch((error) => {
@@ -100,16 +100,16 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
       <Input variant="rounded">
   <InputField
     placeholder="Value"
-    value={value}
+    value={prodValue}
     onChange={(e) => {
       const inputValue = e.nativeEvent.text;
       const numericValue = parseFloat(inputValue);
 
-      if (!isNaN(numericValue) && numericValue > 0) {
-        setValue(numericValue.toString()); // Ensure that the value is stored as a string
+      if (!isNaN(numericValue) && numericValue >= 0) {
+        setProdValue(numericValue.toString()); // Ensure that the value is stored as a string
       } else {
         // Set value to an empty string or 0
-        setValue(""); // for empty string
+        setProdValue(""); // for empty string
         // or
         // setValue("0"); // for 0
       }
@@ -121,7 +121,7 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
 
       <Select onValueChange={(arg) => setProdCategory(arg)}>
         <SelectTrigger variant="rounded" size="md">
-          <SelectInput placeholder="Select option" />
+          <SelectInput placeholder="Select category" />
           {/* @ts-ignore */}
           <SelectIcon mr="$3">
             <Icon as={ChevronDownIcon} />
@@ -133,7 +133,6 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
             <SelectDragIndicatorWrapper>
               <SelectDragIndicator />
             </SelectDragIndicatorWrapper>
-            {/* <SelectItem label="UX Research" value="ux" /> */}
             {categories.map((category, index) => {
               return (
                 <SelectItem
@@ -162,7 +161,7 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
         title="Add Product"
         onPress={addProduct}
         buttonStyle={styles.loginButton}
-        titleStyle={styles.loginButtonText} // Center text horizontally
+        titleStyle={styles.loginButtonText}
       />
     </View>
   );
@@ -172,18 +171,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    // alignItems: "center",
     gap: 10,
     backgroundColor: "#f2f2f2",
     paddingHorizontal: 15,
   },
   labelContainer: {
-    marginBottom: 100, // Adjust spacing between label and inputs
+    marginBottom: 100,
   },
   expiryLabel: {
     fontSize: 30,
     fontWeight: "bold",
-    color: "#333", // Adjust color if needed
+    color: "#333",
   },
   input: {
     marginVertical: 1,
@@ -202,7 +200,6 @@ const styles = StyleSheet.create({
     margin: "auto",
   },
   loginButtonText: {
-    // marginRight: 80,
     margin: "auto",
   },
   signupButton: {

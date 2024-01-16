@@ -4,15 +4,14 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
-  Platform,
-  Modal,
   Pressable,
+  Dimensions,
 } from "react-native";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
+//@ts-ignore
 import SwipeableFlatList from "react-native-swipeable-list";
 
-import { signOut } from "firebase/auth";
-import { auth, firebase, db } from "../../firebase.config";
+import { auth, db } from "../../firebase.config";
 import withAuthProtection from "../hocs/withAuthProtection";
 import {
   collection,
@@ -24,9 +23,23 @@ import {
 import { NOTIFY_BEFORE } from "../config";
 import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Button, Center, Divider, HStack } from "@gluestack-ui/themed";
+import { Center,
+   ChevronDownIcon,
+   Divider,
+   Icon,
+   Select,
+   SelectBackdrop,
+   SelectContent,
+   SelectDragIndicator,
+   SelectDragIndicatorWrapper,
+   SelectIcon,
+   SelectInput,
+   SelectItem,
+   SelectPortal,
+   SelectTrigger } from "@gluestack-ui/themed";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "@gluestack-ui/themed";
+
 const darkColors = {
   background: "#121212",
   primary: "#BB86FC",
@@ -41,13 +54,22 @@ const colorEmphasis = {
   medium: 0.6,
   disabled: 0.38,
 };
-// import PushNotification from "react-native-push-notification";
 
 interface Props {
   navigation: NavigationProp<ParamListBase>;
 }
 
 const HomeScreen: React.FC<Props> = ({ navigation }) => {
+  const categories = [
+    { label: "All", value: "all" },
+    { label: "Electronics", value: "electronics" },
+    { label: "Books", value: "books" },
+    { label: "Clothing", value: "clothing" },
+    { label: "Home", value: "home" },
+    { label: "Food", value: "food" },
+    { label: "None", value: "" },
+  ];
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const handleAddProduct = () => {
     navigation.navigate("AddProduct");
   };
@@ -100,7 +122,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
               expiry_date: new Date(data.expiry_date),
             };
           }).filter((product) => product.uid === currentUserUid)
-          // @ts-ignore
+          //@ts-ignore
           .sort((a, b) => a.expiry_date - b.expiry_date);
         const { expired, active, archived } = groupByStatus(productsList);
         setExpired(expired);
@@ -143,18 +165,19 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    const toDelete = doc(db, "products", id);
-    console.log("deleting", doc);
-    await deleteDoc(toDelete);
-  };
-
   const checkForExpiringProducts = async (productsList: any[]) => {
-    const now = new Date().getTime();
+    console.log("-----------------------------------------------");
     for (const product of productsList) {
       console.log(product);
       if (
-        product.expiry_date - now <= NOTIFY_BEFORE &&
+        isExpired(product) &&
+        !(await isProductAlreadyNotified(product.id))
+      ) {
+        Alert.alert("Expiration Alert", `${product.name} has expired!`);
+        await storeExpiredProductId(product.id);
+      }
+      else if (
+        isExpiringSoon(product) &&
         !(await isProductAlreadyNotified(product.id))
       ) {
         Alert.alert("Expiration Alert", `${product.name} is expiring soon!`);
@@ -165,14 +188,24 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
   const updateStatus = async (id: string, status: string) => {
     const toUpdate = doc(db, "products", id);
-    console.log("updating status", doc);
     await updateDoc(toUpdate, { status });
   };
 
-  const isExpiringSoon = (date: Date) => {
+  const isExpired = (product: any) => {
     const now = new Date();
-    return date.getTime() - now.getTime() <= NOTIFY_BEFORE;
+    return product.expiry_date <= now.getTime() - NOTIFY_BEFORE / 3;
   };
+
+  const isExpiringSoon = (product: any) => {
+    const now = new Date();
+    return product.expiry_date - now.getTime() <= NOTIFY_BEFORE;
+  };
+
+  const handleDelete = async (id: string) => {
+    const toDelete = doc(db, "products", id);
+    await deleteDoc(toDelete);
+  };
+
   const QuickActions = (index: number, qaItem: any) => {
     return (
       <View style={styles.qaContainer}>
@@ -219,28 +252,61 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <View>
       <SafeAreaView>
-        <Center>
-          <Text size="2xl" bold>
-            Active Items
-          </Text>
-        </Center>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: Dimensions.get("window").height * 0.06 + 10, borderBottomWidth: 2 }}>
+      <Text size="2xl" bold style={{marginLeft: "5%", marginBottom: "5%"}}>
+        Active Items
+      </Text>
+      <Select onValueChange={(arg) => {setSelectedCategory(arg)}} style={{ width: 165, paddingBottom: "5%", paddingRight: "5%" }}>
+        <SelectTrigger variant="rounded" size="md" >
+          <SelectInput placeholder="Category" />
+          {/* @ts-ignore */}
+          <SelectIcon mr="$3">
+            <Icon as={ChevronDownIcon} />
+          </SelectIcon>
+        </SelectTrigger>
+        <SelectPortal>
+          <SelectBackdrop />
+          <SelectContent>
+            <SelectDragIndicatorWrapper>
+              <SelectDragIndicator />
+            </SelectDragIndicatorWrapper>
+            {categories.map((category, index) => {
+              return (
+                <SelectItem
+                  key={index}
+                  label={category.label}
+                  value={category.value}
+                />
+              );
+            })}
+          </SelectContent>
+        </SelectPortal>
+      </Select>
+    </View>
         <SwipeableFlatList
+          height={Dimensions.get("window").height * 0.6 + 5}
           keyExtractor={extractItemKey}
           data={active}
           renderItem={({ item }: any) => {
-            console.log(item);
             const formattedDate = item.expiry_date.toLocaleDateString();
-            const expiringSoon = isExpiringSoon(item.expiry_date);
+            const expiringSoon = isExpiringSoon(item);
+            const expired = isExpired(item);
 
             return (
-              // <Text>{item.name}</Text>
-              <View style={styles.productContainer}>
+              (selectedCategory == "all" ||
+              item.category == selectedCategory) &&
+              <View style={[styles.productContainer,
+                expiringSoon && styles.expiringSoon,
+                expired && styles.expired,
+              ]}
+              >
                 <View style={styles.productDetails}>
                   <Text style={styles.productName}>{item.name}</Text>
                   <Text
                     style={[
                       styles.productDate,
                       expiringSoon && styles.expiringSoon,
+                      expired && styles.expired,
                     ]}
                   >
                     {formattedDate}
@@ -250,11 +316,11 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
               </View>
             );
           }}
-          maxSwipeDistance={275}
+          maxSwipeDistance={240}
+          speed
           renderQuickActions={({ index, item }: any) =>
             QuickActions(index, item)
           }
-          // contentContainerStyle={styles.contentContainerStyle}
           shouldBounceOnMount={true}
           ItemSeparatorComponent={<Divider />}
         />
@@ -270,16 +336,29 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    // alignItems: "center",
+    gap: 10,
     backgroundColor: "#f2f2f2",
     paddingHorizontal: 15,
   },
   productText: {
     fontSize: 20,
+  },
+  filterButton: {
+    backgroundColor: "grey",
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginRight: "5%",
+    marginBottom: "5%",
+  },
+  filterButtonText: {
+    color: "white",
+    fontSize: 16,
   },
   addProductButton: {
     width: 50,
@@ -288,11 +367,13 @@ const styles = StyleSheet.create({
     backgroundColor: "black",
     alignItems: "center",
     justifyContent: "center",
+    marginTop: "5%",
     marginBottom: "5%",
   },
   addProductButtonText: {
     fontSize: 20,
     color: "white",
+    paddingTop: "25%",
   },
   productContainer: {
     flexDirection: "row",
@@ -300,10 +381,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderBottomWidth: 1,
     borderColor: "#ccc",
-    backgroundColor: "#f2f2f2",
+    backgroundColor: "#e5e5e5",
     paddingVertical: 10,
-    // marginBottom: 10,
     width: "100%",
+    height: Dimensions.get("window").height / 10,
     paddingLeft: 10,
     paddingRight: 10,
   },
@@ -324,8 +405,13 @@ const styles = StyleSheet.create({
     color: "black",
     fontStyle: "italic",
   },
+  expired: {
+    color: "red",
+    backgroundColor: "#ff7e82"
+  },
   expiringSoon: {
     color: "red",
+    backgroundColor: "#ffb5b7"
   },
   centeredView: {
     flex: 1,
@@ -423,17 +509,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     opacity: colorEmphasis.high,
   },
-  button1Text: {
-    color: darkColors.primary,
-  },
-  button2Text: {
-    color: darkColors.secondary,
-  },
-  button3Text: {
-    color: darkColors.error,
-  },
-  contentContainerStyle: {
-    flexGrow: 1,
-  },
 });
+
 export default withAuthProtection(HomeScreen);

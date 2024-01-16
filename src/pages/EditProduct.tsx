@@ -35,7 +35,7 @@ const EditProduct: React.FC<Props> = ({ route, navigation }) => {
   const [prodName, setProdName] = useState<string>(selectedProduct.name);
   const [prodCategory, setProdCategory] = useState<string>(selectedProduct.category);
   const [prodExpiryDate, setProdExpiryDate] = useState(new Date(selectedProduct.expiry_date.toUTCString()));
-  const [value, setValue] = React.useState<string>(selectedProduct.value);
+  const [prodValue, setProdValue] = React.useState<string>(selectedProduct.value);
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const categories = [
@@ -45,7 +45,6 @@ const EditProduct: React.FC<Props> = ({ route, navigation }) => {
     { label: "Home", value: "home" },
     { label: "Food", value: "food" },
   ];
-  // this could be done on the server
 
   const handleDateChange = (event: any, date: any) => {
     setShowDatePicker(Platform.OS === "ios"); // On iOS, DateTimePicker is shown in a modal
@@ -64,7 +63,7 @@ const EditProduct: React.FC<Props> = ({ route, navigation }) => {
     await updateDoc(productRef, {category: prodCategory, 
                                  expiry_date: prodExpiryDate.toUTCString(), 
                                  name: prodName,
-                                 value: value,
+                                 value: prodValue,
                                  })
       .then(() => {
         Alert.alert(selectedProduct.name + " updated successfully!");
@@ -93,14 +92,14 @@ const EditProduct: React.FC<Props> = ({ route, navigation }) => {
       <Input variant="rounded">
   <InputField
     placeholder="Value"
-    value={value}
+    value={prodValue}
     onChange={(e) => {
       const inputValue = e.nativeEvent.text;
       const numericValue = parseFloat(inputValue);
-      if (!isNaN(numericValue) && numericValue > 0) {
-        setValue(numericValue.toString()); 
+      if (!isNaN(numericValue) && numericValue >= 0) {
+        setProdValue(numericValue.toString()); 
       } else {
-        setValue(""); 
+        setProdValue(""); 
       }
     }}
   />
@@ -108,7 +107,7 @@ const EditProduct: React.FC<Props> = ({ route, navigation }) => {
 
       <Select onValueChange={(arg) => setProdCategory(arg)}>
         <SelectTrigger variant="rounded" size="md">
-          <SelectInput placeholder="Select option" value={prodCategory}/>
+          <SelectInput placeholder="Select category" value={prodCategory}/>
           {/* @ts-ignore */}
           <SelectIcon mr="$3">
             <Icon as={ChevronDownIcon} />
@@ -120,7 +119,6 @@ const EditProduct: React.FC<Props> = ({ route, navigation }) => {
             <SelectDragIndicatorWrapper>
               <SelectDragIndicator />
             </SelectDragIndicatorWrapper>
-            {/* <SelectItem label="UX Research" value="ux" /> */}
             {categories.map((category, index) => {
               return (
                 <SelectItem
@@ -149,7 +147,7 @@ const EditProduct: React.FC<Props> = ({ route, navigation }) => {
         title="Edit Product"
         onPress={editProduct}
         buttonStyle={styles.loginButton}
-        titleStyle={styles.loginButtonText} // Center text horizontally
+        titleStyle={styles.loginButtonText}
       />
     </View>
   );
@@ -159,18 +157,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    // alignItems: "center",
     gap: 10,
     backgroundColor: "#f2f2f2",
     paddingHorizontal: 15,
   },
   labelContainer: {
-    marginBottom: 100, // Adjust spacing between label and inputs
+    marginBottom: 100,
   },
   expiryLabel: {
     fontSize: 30,
     fontWeight: "bold",
-    color: "#333", // Adjust color if needed
+    color: "#333",
   },
   input: {
     marginVertical: 1,
@@ -189,7 +186,6 @@ const styles = StyleSheet.create({
     margin: "auto",
   },
   loginButtonText: {
-    // marginRight: 80,
     margin: "auto",
   },
   signupButton: {
