@@ -5,7 +5,7 @@ import { Button } from "react-native-elements";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
 import CurrencyInput from "react-native-currency-input";
 
-import { db } from "../../firebase.config";
+import { db, auth } from "../../firebase.config";
 import { collection } from "firebase/firestore";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {
@@ -39,7 +39,7 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
   const [prodExpiryDate, setProdExpiryDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [value, setValue] = React.useState<string>("0");
-  console.log(prodCategory);
+ // console.log(prodCategory);
 
   const categories = [
     { label: "Electronics", value: "electronics" },
@@ -69,6 +69,7 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
       category: prodCategory,
       expiry_date: prodExpiryDate.toUTCString(),
       id: Math.random().toString(36).substr(2, 9),
+      uid : auth.currentUser?.uid,
       value,
     })
       .then((ref) => {

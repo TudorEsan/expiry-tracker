@@ -96,8 +96,7 @@ const styles = StyleSheet.create({
     margin: "auto",
   },
   loginButtonText: {
-    // marginRight: 80,
-    margin: "auto",
+    marginRight: 100,
   },
   signupButton: {
     backgroundColor: "transparent",

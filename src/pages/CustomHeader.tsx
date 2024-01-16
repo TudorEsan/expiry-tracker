@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { StackHeaderProps } from "@react-navigation/stack";
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebase.config";
-import { Button, Icon, SettingsIcon, ShareIcon } from "@gluestack-ui/themed";
+import { Button, Icon, SettingsIcon, ShareIcon ,EyeIcon} from "@gluestack-ui/themed";
 
 const CustomHeader: React.FC<StackHeaderProps> = ({ navigation }) => {
   const handleSignOut = async () => {
@@ -29,6 +29,17 @@ const CustomHeader: React.FC<StackHeaderProps> = ({ navigation }) => {
       >
         <Icon as={ShareIcon} color="$white" />
       </Button>
+      <Button
+        size="sm"
+        rounded="$full"
+        bgColor="$secondary500"
+        onPress={() => {
+          navigation.navigate("Charts");
+        }}
+      >
+        <Icon as={EyeIcon} color="$white" />
+      </Button>
+
       {/* <Button size='sm' rounded='$full' bgColor="$secondary500">
         <Icon as={ShareIcon} color="$white" />
       </Button> */}
