@@ -98,15 +98,26 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
       </Input>
 
       <Input variant="rounded">
-        <InputField
-          placeholder="Value"
-          value={prodValue}
-          // type="number"
-          onChange={(e) => {
-            setProdValue(e.nativeEvent.text);
-          }}
-        />
-      </Input>
+  <InputField
+    placeholder="Value"
+    value={prodValue}
+    onChange={(e) => {
+      const inputValue = e.nativeEvent.text;
+      const numericValue = parseFloat(inputValue);
+
+      if (!isNaN(numericValue) && numericValue >= 0) {
+        setProdValue(numericValue.toString()); // Ensure that the value is stored as a string
+      } else {
+        // Set value to an empty string or 0
+        setProdValue(""); // for empty string
+        // or
+        // setValue("0"); // for 0
+      }
+    }}
+  />
+</Input>
+
+
 
       <Select onValueChange={(arg) => setProdCategory(arg)}>
         <SelectTrigger variant="rounded" size="md">

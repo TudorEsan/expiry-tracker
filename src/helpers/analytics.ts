@@ -15,6 +15,9 @@ export function analyzeProducts(products: any[]) {
   const currentDate = new Date();
   const productStatistics = {
     mostRecentExpiredDate: Date,
+    mostRecentWonDate: Date,
+    valueWonByCategory: Array.from({ length: 5 }, () => 0) as number[],
+    valueWonByMonth: Array.from({ length: 12 }, () => 0) as number[],
     valueLostByCategory: Array.from({ length: 5 }, () => 0) as number[],
     valueLostByMonth: Array.from({ length: 12 }, () => 0) as number[],
     mostLikelyToExpire: {} as Record<string, number>,
@@ -53,6 +56,7 @@ export function analyzeProducts(products: any[]) {
       (productStatistics.categoryDistribution[product.category] || 0) + 1;
 
     // Update status distribution
+    //@ts-ignore
     productStatistics.statusDistribution[product.status]++;
 
     // Check for products likely to expire or be archived
@@ -60,19 +64,43 @@ export function analyzeProducts(products: any[]) {
     if (product.status === "expired" && product.category === "electronics") { 
       productStatistics.valueLostByCategory[0]+= 1
     }
+    else if (product.status === "archived" && product.category === "electronics")
+    {
+      productStatistics.valueWonByCategory[0]+= 1
+    }
 
     if (product.status === "expired" && product.category === "books") { 
       productStatistics.valueLostByCategory[1]+= 1
     }
+    else if (product.status === "archived" && product.category === "books")
+    {
+      productStatistics.valueWonByCategory[1]+= 1
+    }
+
     if (product.status === "expired" && product.category === "clothing") { 
       productStatistics.valueLostByCategory[2]+= 1
     }
+    else if (product.status === "archived" && product.category === "clothing")
+    {
+      productStatistics.valueWonByCategory[2]+= 1
+    }
+
     if (product.status === "expired" && product.category === "home") { 
       productStatistics.valueLostByCategory[3]+= 1
     }
+    else if (product.status === "archived" && product.category === "home")
+    {
+      productStatistics.valueWonByCategory[3]+= 1
+    }
+
     if (product.status === "expired" && product.category === "food") { 
       productStatistics.valueLostByCategory[4]+= 1
     }
+    else if (product.status === "archived" && product.category === "food")
+    {
+      productStatistics.valueWonByCategory[4]+= 1
+    }
+  
     
     const expiryDate = new Date(product.expiry_date);
     if (product.status === "expired") {
@@ -94,7 +122,18 @@ export function analyzeProducts(products: any[]) {
       } else {
         productStatistics.likelyToBeArchived[product.category] += 1;
       }
+      
+    if ( monthsDifference <= 12) {
+      const monthIndex = monthsDifference >= 0 ? monthsDifference : 0;
+      productStatistics.valueWonByMonth[monthIndex] += Number(product.value);
     }
+    if (dateDifferenceInDays(product.expiry_date,currentDate)<differenceDate)
+      {
+        differenceDate = dateDifferenceInDays(currentDate,product.expiry_date);
+        productStatistics.mostRecentWonDate=product.expiry_date;
+      }
+    }
+    
 
     // Calculate total value of expired products
     if (product.status === "expired") {

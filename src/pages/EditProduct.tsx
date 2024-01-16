@@ -90,15 +90,20 @@ const EditProduct: React.FC<Props> = ({ route, navigation }) => {
       </Input>
 
       <Input variant="rounded">
-        <InputField
-          placeholder="Value"
-          value={value}
-          // type="number"
-          onChange={(e) => {
-            setValue(e.nativeEvent.text);
-          }}
-        />
-      </Input>
+  <InputField
+    placeholder="Value"
+    value={value}
+    onChange={(e) => {
+      const inputValue = e.nativeEvent.text;
+      const numericValue = parseFloat(inputValue);
+      if (!isNaN(numericValue) && numericValue > 0) {
+        setValue(numericValue.toString()); 
+      } else {
+        setValue(""); 
+      }
+    }}
+  />
+</Input>
 
       <Select onValueChange={(arg) => setProdCategory(arg)}>
         <SelectTrigger variant="rounded" size="md">
