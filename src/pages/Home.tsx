@@ -8,6 +8,7 @@ import {
   Modal,
   Pressable,
   ScrollView,
+  Dimensions,
 } from "react-native";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
 import SwipeableFlatList from "react-native-swipeable-list";
@@ -243,14 +244,14 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <View>
       <SafeAreaView>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomWidth: 2 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: Dimensions.get("window").height * 0.06 + 10, borderBottomWidth: 2 }}>
       {/* Left container for the title */}
-      <Text size="2xl" bold style={{marginLeft: "5%"}}>
+      <Text size="2xl" bold style={{marginLeft: "5%", marginBottom: "5%"}}>
         Active Items
       </Text>
 
       {/* Right container for TouchableOpacity */}
-      <MenuProvider style={{width: 35}}>
+      {/*<MenuProvider style={{width: 35}}>
      <Menu>
        <MenuTrigger
          text="Filter"
@@ -261,10 +262,13 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
          <MenuOption onSelect={() => alert(`Delete`)} text="Delete" />
        </MenuOptions>
      </Menu>
-   </MenuProvider>
+   </MenuProvider>*/}
+   <TouchableOpacity style={styles.filterButton}>
+    <Text style={styles.filterButtonText}>Filter</Text>
+   </TouchableOpacity>
     </View>
         <SwipeableFlatList
-          height="76.5%"
+          height={Dimensions.get("window").height * 0.6 + 5}
           keyExtractor={extractItemKey}
           data={active}
           renderItem={({ item }: any) => {
@@ -273,7 +277,10 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
             return (
               // <Text>{item.name}</Text>
-              <View style={styles.productContainer}>
+              <View style={[styles.productContainer,
+                expiringSoon && styles.expiringSoon,
+              ]}
+              >
                 <View style={styles.productDetails}>
                   <Text style={styles.productName}>{item.name}</Text>
                   <Text
@@ -321,6 +328,18 @@ const styles = StyleSheet.create({
   productText: {
     fontSize: 20,
   },
+  filterButton: {
+    backgroundColor: "grey",
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginRight: "5%",
+    marginBottom: "5%",
+  },
+  filterButtonText: {
+    color: "white",
+    fontSize: 16,
+  },
   addProductButton: {
     width: 50,
     height: 50,
@@ -346,7 +365,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     // marginBottom: 10,
     width: "100%",
-    height: 70,
+    height: Dimensions.get("window").height / 10,
     paddingLeft: 10,
     paddingRight: 10,
   },
@@ -369,6 +388,7 @@ const styles = StyleSheet.create({
   },
   expiringSoon: {
     color: "red",
+    backgroundColor: "#FFD0CF"
   },
   centeredView: {
     flex: 1,
