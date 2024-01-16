@@ -95,8 +95,8 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
             const data = doc.data();
             return {
               ...data,
-              uid: data.uid,
               id: doc.id,
+              uid: data.uid,
               expiry_date: new Date(data.expiry_date),
             };
           }).filter((product) => product.uid === currentUserUid)
@@ -152,7 +152,6 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const checkForExpiringProducts = async (productsList: any[]) => {
     const now = new Date().getTime();
     for (const product of productsList) {
- 
       console.log(product);
       if (
         product.expiry_date - now <= NOTIFY_BEFORE &&

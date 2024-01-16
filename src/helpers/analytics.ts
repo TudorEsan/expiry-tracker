@@ -56,6 +56,7 @@ export function analyzeProducts(products: any[]) {
       (productStatistics.categoryDistribution[product.category] || 0) + 1;
 
     // Update status distribution
+    //@ts-ignore
     productStatistics.statusDistribution[product.status]++;
 
     // Check for products likely to expire or be archived
