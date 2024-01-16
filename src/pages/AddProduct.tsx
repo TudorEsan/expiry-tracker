@@ -14,8 +14,6 @@ import {
   Icon,
   Input,
   InputField,
-  InputIcon,
-  InputSlot,
   Select,
   SelectBackdrop,
   SelectContent,
@@ -48,7 +46,6 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
     { label: "Home", value: "home" },
     { label: "Food", value: "food" },
   ];
-  // this could be done on the server
 
   const handleDateChange = (event: any, date: any) => {
     setShowDatePicker(Platform.OS === "ios"); // On iOS, DateTimePicker is shown in a modal
@@ -113,7 +110,7 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
 
       <Select onValueChange={(arg) => setProdCategory(arg)}>
         <SelectTrigger variant="rounded" size="md">
-          <SelectInput placeholder="Select option" />
+          <SelectInput placeholder="Select category" />
           {/* @ts-ignore */}
           <SelectIcon mr="$3">
             <Icon as={ChevronDownIcon} />
@@ -125,7 +122,6 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
             <SelectDragIndicatorWrapper>
               <SelectDragIndicator />
             </SelectDragIndicatorWrapper>
-            {/* <SelectItem label="UX Research" value="ux" /> */}
             {categories.map((category, index) => {
               return (
                 <SelectItem
@@ -154,7 +150,7 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
         title="Add Product"
         onPress={addProduct}
         buttonStyle={styles.loginButton}
-        titleStyle={styles.loginButtonText} // Center text horizontally
+        titleStyle={styles.loginButtonText}
       />
     </View>
   );
@@ -164,18 +160,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    // alignItems: "center",
     gap: 10,
     backgroundColor: "#f2f2f2",
     paddingHorizontal: 15,
   },
   labelContainer: {
-    marginBottom: 100, // Adjust spacing between label and inputs
+    marginBottom: 100,
   },
   expiryLabel: {
     fontSize: 30,
     fontWeight: "bold",
-    color: "#333", // Adjust color if needed
+    color: "#333",
   },
   input: {
     marginVertical: 1,
@@ -194,7 +189,6 @@ const styles = StyleSheet.create({
     margin: "auto",
   },
   loginButtonText: {
-    // marginRight: 80,
     margin: "auto",
   },
   signupButton: {

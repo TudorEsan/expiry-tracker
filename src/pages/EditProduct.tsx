@@ -45,7 +45,6 @@ const EditProduct: React.FC<Props> = ({ route, navigation }) => {
     { label: "Home", value: "home" },
     { label: "Food", value: "food" },
   ];
-  // this could be done on the server
 
   const handleDateChange = (event: any, date: any) => {
     setShowDatePicker(Platform.OS === "ios"); // On iOS, DateTimePicker is shown in a modal
@@ -103,7 +102,7 @@ const EditProduct: React.FC<Props> = ({ route, navigation }) => {
 
       <Select onValueChange={(arg) => setProdCategory(arg)}>
         <SelectTrigger variant="rounded" size="md">
-          <SelectInput placeholder="Select option" value={prodCategory}/>
+          <SelectInput placeholder="Select category" value={prodCategory}/>
           {/* @ts-ignore */}
           <SelectIcon mr="$3">
             <Icon as={ChevronDownIcon} />
@@ -115,7 +114,6 @@ const EditProduct: React.FC<Props> = ({ route, navigation }) => {
             <SelectDragIndicatorWrapper>
               <SelectDragIndicator />
             </SelectDragIndicatorWrapper>
-            {/* <SelectItem label="UX Research" value="ux" /> */}
             {categories.map((category, index) => {
               return (
                 <SelectItem
@@ -144,7 +142,7 @@ const EditProduct: React.FC<Props> = ({ route, navigation }) => {
         title="Edit Product"
         onPress={editProduct}
         buttonStyle={styles.loginButton}
-        titleStyle={styles.loginButtonText} // Center text horizontally
+        titleStyle={styles.loginButtonText}
       />
     </View>
   );
@@ -154,18 +152,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    // alignItems: "center",
     gap: 10,
     backgroundColor: "#f2f2f2",
     paddingHorizontal: 15,
   },
   labelContainer: {
-    marginBottom: 100, // Adjust spacing between label and inputs
+    marginBottom: 100,
   },
   expiryLabel: {
     fontSize: 30,
     fontWeight: "bold",
-    color: "#333", // Adjust color if needed
+    color: "#333",
   },
   input: {
     marginVertical: 1,
@@ -184,7 +181,6 @@ const styles = StyleSheet.create({
     margin: "auto",
   },
   loginButtonText: {
-    // marginRight: 80,
     margin: "auto",
   },
   signupButton: {
