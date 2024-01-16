@@ -89,15 +89,17 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     const unsubscribe = onSnapshot(
       collection(db, "products"),
       async (snapshot) => {
+        const currentUserUid = auth.currentUser?.uid;
         const productsList = snapshot.docs
           .map((doc) => {
             const data = doc.data();
             return {
               ...data,
               id: doc.id,
+              uid: data.uid,
               expiry_date: new Date(data.expiry_date),
             };
-          })
+          }).filter((product) => product.uid === currentUserUid)
           // @ts-ignore
           .sort((a, b) => a.expiry_date - b.expiry_date);
         const { expired, active, archived } = groupByStatus(productsList);
@@ -150,7 +152,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const checkForExpiringProducts = async (productsList: any[]) => {
     const now = new Date().getTime();
     for (const product of productsList) {
-      console.log(product);
+      console.log("a",product);
       if (
         product.expiry_date - now <= NOTIFY_BEFORE &&
         !(await isProductAlreadyNotified(product.id))
