@@ -189,7 +189,6 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
   const isExpiringSoon = (product: any) => {
     const now = new Date();
-    console.log(product.name, " - ", product.expiry_date, " - expiring soon: ", product.expiry_date <= now.getTime() + NOTIFY_BEFORE);
     return product.expiry_date - now.getTime() <= NOTIFY_BEFORE;
   };
 
