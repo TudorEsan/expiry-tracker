@@ -172,7 +172,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         !(await isProductAlreadyNotified(product.id))
       ) {
         Alert.alert("Expiration Alert", `${product.name} is expiring soon!`);
-        await storeExpiredProductId(product.id);
+        
       }
     }
   };
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderBottomWidth: 1,
     borderColor: "#ccc",
-    backgroundColor: "#e5e5e5",
+    backgroundColor: "#c0e19a",
     paddingVertical: 10,
     width: "100%",
     height: Dimensions.get("window").height / 10,
@@ -416,12 +416,12 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   expired: {
-    color: "red",
-    backgroundColor: "#ff7e82"
+    color: "white",
+    backgroundColor: "#e49c04"
   },
   expiringSoon: {
-    color: "red",
-    backgroundColor: "#ffb5b7"
+    color: "white",
+    backgroundColor: "#fcd37c"
   },
   centeredView: {
     flex: 1,
