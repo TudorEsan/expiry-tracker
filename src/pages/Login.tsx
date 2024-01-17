@@ -4,8 +4,6 @@ import { Input, Button, CheckBox } from 'react-native-elements';
 import { auth } from "../../firebase.config";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../App";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
 
 interface Props {
@@ -17,7 +15,6 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const [password, setPassword] = useState<string>("");
   const [rememberMe, setRememberMe] = useState<boolean>(false);
 
-  // Load stored credentials on component mount
   useEffect(() => {
     loadStoredCredentials();
   }, []);
@@ -42,13 +39,11 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
 
-      // Save credentials if "Remember Me" is checked
       if (rememberMe) {
         await AsyncStorage.setItem('storedEmail', email);
         await AsyncStorage.setItem('storedPassword', password);
         await AsyncStorage.setItem('storedRememberMe', 'true');
       } else {
-        // Clear stored credentials if "Remember Me" is not checked
         await AsyncStorage.removeItem('storedEmail');
         await AsyncStorage.removeItem('storedPassword');
         await AsyncStorage.removeItem('storedRememberMe');
@@ -115,12 +110,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
   labelContainer: {
-    marginBottom: 100, // Adjust spacing between label and inputs
+    marginBottom: 100, //spacing between label and inputs
   },
   expiryLabel: {
     fontSize: 30,
     fontWeight: "bold",
-    color: "#333", // Adjust color if needed
+    color: "#333",
   },
   input: {
     marginVertical: 1,

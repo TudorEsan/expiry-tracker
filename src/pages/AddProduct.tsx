@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { View, Alert, StyleSheet, Platform } from "react-native";
 import { Button } from "react-native-elements";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
-import CurrencyInput from "react-native-currency-input";
 
 import { db, auth } from "../../firebase.config";
 import { collection } from "firebase/firestore";
@@ -14,8 +13,6 @@ import {
   Icon,
   Input,
   InputField,
-  InputIcon,
-  InputSlot,
   Select,
   SelectBackdrop,
   SelectContent,
@@ -28,6 +25,7 @@ import {
   SelectTrigger,
   Text,
 } from "@gluestack-ui/themed";
+import { categories } from "../config";
 
 interface Props {
   navigation: NavigationProp<ParamListBase>;
@@ -40,15 +38,6 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
   const [prodExpiryDate, setProdExpiryDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [prodValue, setProdValue] = React.useState<string>("0");
- 
-  const categories = [
-    { label: "Electronics", value: "electronics" },
-    { label: "Books", value: "books" },
-    { label: "Clothing", value: "clothing" },
-    { label: "Home", value: "home" },
-    { label: "Food", value: "food" },
-  ];
-  // this could be done on the server
 
   const handleDateChange = (event: any, date: any) => {
     setShowDatePicker(Platform.OS === "ios"); // On iOS, DateTimePicker is shown in a modal
@@ -109,19 +98,13 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
       const numericValue = parseFloat(inputValue);
       
       if (!isNaN(numericValue) && numericValue >= 0) {
-        setProdValue(numericValue.toString()); // Ensure that the value is stored as a string 
+        setProdValue(numericValue.toString());
       } else {
-        // Set value to an empty string or 0
-        setProdValue(""); // for empty string
-        // or
-        // setValue("0"); // for 0 
+        setProdValue("");
       }
     }}
   />
 </Input>
-
-
-
       <Select onValueChange={(arg) => setProdCategory(arg)}>
         <SelectTrigger variant="rounded" size="md">
           <SelectInput placeholder="Select category" />
@@ -136,7 +119,6 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
             <SelectDragIndicatorWrapper>
               <SelectDragIndicator />
             </SelectDragIndicatorWrapper>
-            {/* <SelectItem label="UX Research" value="ux" /> */}
             {categories.map((category, index) => {
               return (
                 <SelectItem
@@ -176,7 +158,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    // alignItems: "center",
     gap: 10,
     backgroundColor: "#f2f2f2",
     paddingHorizontal: 15,
@@ -206,7 +187,6 @@ const styles = StyleSheet.create({
     margin: "auto",
   },
   loginButtonText: {
-    // marginRight: 80,
     margin: "auto",
   },
   signupButton: {
@@ -220,33 +200,6 @@ const styles = StyleSheet.create({
   signupText: {
     color: "black",
     marginRight: 25,
-  },
-});
-
-const pickerSelectStyles = StyleSheet.create({
-  inputIOS: {
-    fontSize: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    borderWidth: 1,
-    borderColor: "gray",
-    borderRadius: 4,
-    color: "black",
-    paddingRight: 30, // to ensure the text is never behind the icon
-    marginVertical: 10,
-    width: "100%",
-  },
-  inputAndroid: {
-    fontSize: 16,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderWidth: 0.5,
-    borderColor: "purple",
-    borderRadius: 8,
-    color: "black",
-    paddingRight: 30, // to ensure the text is never behind the icon
-    marginVertical: 10,
-    width: "100%",
   },
 });
 

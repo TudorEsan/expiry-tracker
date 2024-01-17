@@ -1,12 +1,10 @@
-import { Center, HStack, Spinner, Text, VStack, View } from "@gluestack-ui/themed";
+import { Center, Spinner, Text, VStack } from "@gluestack-ui/themed";
 import { collection, onSnapshot } from "firebase/firestore";
 import React, { useEffect } from "react";
 import { db, auth } from "../../firebase.config";
 import { analyzeProducts } from "../helpers/analytics";
 
-
 export const Analytics = () => {
-  
   const [analytics, setAnalytics] = React.useState<any>(null);
   const [products, setProducts] = React.useState<any>(null);
   useEffect(() => {
@@ -85,7 +83,7 @@ export const Analytics = () => {
         </VStack>       
       </Center>
     </VStack>
-    
   );
 };
+
 export {  };
