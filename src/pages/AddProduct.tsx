@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { View, Alert, StyleSheet, Platform } from "react-native";
 import { Button } from "react-native-elements";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
-import CurrencyInput from "react-native-currency-input";
 
 import { db, auth } from "../../firebase.config";
 import { collection } from "firebase/firestore";
@@ -97,14 +96,11 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
     onChange={(e) => {
       const inputValue = e.nativeEvent.text;
       const numericValue = parseFloat(inputValue);
-
+      
       if (!isNaN(numericValue) && numericValue >= 0) {
-        setProdValue(numericValue.toString()); // Ensure that the value is stored as a string
+        setProdValue(numericValue.toString());
       } else {
-        // Set value to an empty string or 0
-        setProdValue(""); // for empty string
-        // or
-        // setValue("0"); // for 0
+        setProdValue("");
       }
     }}
   />
@@ -140,6 +136,7 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
       <Button title="Select Date" onPress={showDatepicker} />
       {showDatePicker && (
         <DateTimePicker
+          
           value={prodExpiryDate}
           mode="date"
           is24Hour={true}
