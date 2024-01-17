@@ -26,6 +26,7 @@ import {
   SelectTrigger,
   Text,
 } from "@gluestack-ui/themed";
+import { categories } from "../config";
 
 interface Props {
   navigation: NavigationProp<ParamListBase>;
@@ -38,14 +39,6 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
   const [prodExpiryDate, setProdExpiryDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [prodValue, setProdValue] = React.useState<string>("0");
-
-  const categories = [
-    { label: "Electronics", value: "electronics" },
-    { label: "Books", value: "books" },
-    { label: "Clothing", value: "clothing" },
-    { label: "Home", value: "home" },
-    { label: "Food", value: "food" },
-  ];
 
   const handleDateChange = (event: any, date: any) => {
     setShowDatePicker(Platform.OS === "ios"); // On iOS, DateTimePicker is shown in a modal
@@ -116,9 +109,6 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
     }}
   />
 </Input>
-
-
-
       <Select onValueChange={(arg) => setProdCategory(arg)}>
         <SelectTrigger variant="rounded" size="md">
           <SelectInput placeholder="Select category" />
@@ -213,33 +203,6 @@ const styles = StyleSheet.create({
   signupText: {
     color: "black",
     marginRight: 25,
-  },
-});
-
-const pickerSelectStyles = StyleSheet.create({
-  inputIOS: {
-    fontSize: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    borderWidth: 1,
-    borderColor: "gray",
-    borderRadius: 4,
-    color: "black",
-    paddingRight: 30, // to ensure the text is never behind the icon
-    marginVertical: 10,
-    width: "100%",
-  },
-  inputAndroid: {
-    fontSize: 16,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderWidth: 0.5,
-    borderColor: "purple",
-    borderRadius: 8,
-    color: "black",
-    paddingRight: 30, // to ensure the text is never behind the icon
-    marginVertical: 10,
-    width: "100%",
   },
 });
 

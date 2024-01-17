@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   Text,
 } from "@gluestack-ui/themed";
+import { categories } from "../config";
 
 interface Props {
   navigation: NavigationProp<ParamListBase>;
@@ -37,14 +38,6 @@ const EditProduct: React.FC<Props> = ({ route, navigation }) => {
   const [prodExpiryDate, setProdExpiryDate] = useState(new Date(selectedProduct.expiry_date.toUTCString()));
   const [prodValue, setProdValue] = React.useState<string>(selectedProduct.value);
   const [showDatePicker, setShowDatePicker] = useState(false);
-
-  const categories = [
-    { label: "Electronics", value: "electronics" },
-    { label: "Books", value: "books" },
-    { label: "Clothing", value: "clothing" },
-    { label: "Home", value: "home" },
-    { label: "Food", value: "food" },
-  ];
 
   const handleDateChange = (event: any, date: any) => {
     setShowDatePicker(Platform.OS === "ios"); // On iOS, DateTimePicker is shown in a modal

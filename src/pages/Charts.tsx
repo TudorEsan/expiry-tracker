@@ -1,9 +1,9 @@
-import { Center, HStack, Spinner, Text, VStack, View } from "@gluestack-ui/themed";
+import { Spinner, Text, View } from "@gluestack-ui/themed";
 import { collection, onSnapshot } from "firebase/firestore";
 import React, { useEffect } from "react";
 import { db, auth } from "../../firebase.config";
 import { analyzeProducts } from "../helpers/analytics";
-import { LineChart,  BarChart, PieChart, ProgressChart, ContributionGraph, StackedBarChart } from "react-native-chart-kit";
+import { LineChart, PieChart } from "react-native-chart-kit";
 import { StyleSheet, Dimensions, ScrollView } from "react-native";
 
 export const Charts = () => {
@@ -48,12 +48,10 @@ export const Charts = () => {
     return <Text>Error</Text>;
   }
 
-  const labelsLine = generateLabels(new Date(analytics.mostRecentExpiredDate));
+  const labelsLine = generateLabels(new Date());
   const dataLine = analytics.valueLostByMonth.reverse();
-  const labelsLineWon = generateLabels(new Date(analytics.mostRecentWonDate));
+  const labelsLineWon = generateLabels(new Date());
   const dataLineWon = analytics.valueWonByMonth.reverse();
-  
-
 
 return(
   <ScrollView style={styles.container}>
@@ -115,7 +113,7 @@ return(
       legendFontSize: 15
     },
     {
-      name: "Clothing",
+      name: "Medicine",
       population: analytics.valueLostByCategory[2],
       color: "#d07804",
       legendFontColor: "#7F7F77",
@@ -155,7 +153,6 @@ return(
     backgroundColor="transparent"
     paddingLeft="15"
     absolute //for the absolute number remove if you want percentage
-  
 />
 <View style={styles.labelContainer}>
     <Text style={styles.textLabel}>Money saved in a year</Text>
@@ -169,16 +166,16 @@ return(
         }
       ]
     }}
-    width={Dimensions.get("window").width} // from react-native
+    width={Dimensions.get("window").width}
     height={220}
     //yAxisLabel="$"
     yAxisSuffix="lei"
-    yAxisInterval={1} // optional, defaults to 1
+    yAxisInterval={1}
     chartConfig={{
       backgroundColor: "#1fa305",
       backgroundGradientFrom: "#4f7523",
       backgroundGradientTo: "#1c9404",
-      decimalPlaces: 2, // optional, defaults to 2dp
+      decimalPlaces: 2,
       color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
       labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
       style: {
@@ -215,7 +212,7 @@ return(
       legendFontSize: 15
     },
     {
-      name: "Clothing",
+      name: "Medicine",
       population: analytics.valueWonByCategory[2],
       color: "#c7da27",
       legendFontColor: "#7F7F77",
@@ -267,14 +264,9 @@ return(
 )}
 
 </ScrollView>
-
-
-
 );
 }
 
-
-// Function to generate labels based on most recent expired date
 function generateLabels(mostRecentExpiredDate: Date) {
     const labels = [];
     let currentMonth = mostRecentExpiredDate.getMonth();
@@ -292,7 +284,6 @@ function generateLabels(mostRecentExpiredDate: Date) {
     return labels;
   }
   
-  // Function to get month name based on index
   function getMonthName(monthIndex: number) {
     const months = [
       "Jan",
@@ -324,7 +315,6 @@ function generateLabels(mostRecentExpiredDate: Date) {
     },
     textLabel: {
       fontSize: 17,
-     // fontWeight: "bold",
       color: "#333", 
     },
     labelContainerTip: {

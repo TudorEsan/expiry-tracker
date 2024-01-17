@@ -1,4 +1,3 @@
-// Import necessary components and libraries
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { StackHeaderProps } from "@react-navigation/stack";
@@ -39,10 +38,6 @@ const CustomHeader: React.FC<StackHeaderProps> = ({ navigation }) => {
       >
         <Icon as={EyeIcon} color="$white" />
       </Button>
-
-      {/* <Button size='sm' rounded='$full' bgColor="$secondary500">
-        <Icon as={ShareIcon} color="$white" />
-      </Button> */}
       <TouchableOpacity onPress={handleSignOut} style={styles.signOutButton}>
         <Text style={styles.signOutButtonText}>Sign Out</Text>
       </TouchableOpacity>
@@ -50,7 +45,6 @@ const CustomHeader: React.FC<StackHeaderProps> = ({ navigation }) => {
   );
 };
 
-// Define your styles
 const styles = StyleSheet.create({
   header: {
     flexDirection: "row",

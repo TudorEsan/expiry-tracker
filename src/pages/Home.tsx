@@ -1,7 +1,7 @@
-// screens/HomeScreen.tsx
 import React, { useEffect, useState } from "react";
 import {
   View,
+  Alert,
   StyleSheet,
   TouchableOpacity,
   Pressable,
@@ -21,7 +21,6 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { NOTIFY_BEFORE } from "../config";
-import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Center,
    ChevronDownIcon,
@@ -39,6 +38,7 @@ import { Center,
    SelectTrigger } from "@gluestack-ui/themed";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "@gluestack-ui/themed";
+import { categoryFilter } from "../config";
 
 const darkColors = {
   background: "#121212",
@@ -60,15 +60,6 @@ interface Props {
 }
 
 const HomeScreen: React.FC<Props> = ({ navigation }) => {
-  const categories = [
-    { label: "All", value: "all" },
-    { label: "Electronics", value: "electronics" },
-    { label: "Books", value: "books" },
-    { label: "Clothing", value: "clothing" },
-    { label: "Home", value: "home" },
-    { label: "Food", value: "food" },
-    { label: "None", value: "" },
-  ];
   const [selectedCategory, setSelectedCategory] = useState('all');
   const handleAddProduct = () => {
     navigation.navigate("AddProduct");
@@ -193,11 +184,12 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
   const isExpired = (product: any) => {
     const now = new Date();
-    return product.expiry_date <= now.getTime() - NOTIFY_BEFORE / 3;
+    return product.expiry_date < now.getTime();
   };
 
   const isExpiringSoon = (product: any) => {
     const now = new Date();
+    console.log(product.name, " - ", product.expiry_date, " - expiring soon: ", product.expiry_date <= now.getTime() + NOTIFY_BEFORE);
     return product.expiry_date - now.getTime() <= NOTIFY_BEFORE;
   };
 
@@ -205,19 +197,19 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     const toDelete = doc(db, "products", id);
     await deleteDoc(toDelete);
   };
-
+  const [inputText, setInputText] = useState('');
+  const handleButtonPress = () => {
+    Alert.prompt(
+      'Enter Name',
+      'Please enter your name:',
+      (text) => setInputText(text),
+      'plain-text',
+      inputText
+    );
+  };
   const QuickActions = (index: number, qaItem: any) => {
     return (
       <View style={styles.qaContainer}>
-        <View style={[styles.button]}>
-          <Pressable
-            onPress={() => {
-              updateStatus(qaItem.id, "archived");
-            }}
-          >
-            <Text>Used</Text>
-          </Pressable>
-        </View>
         <View style={[styles.button]}>
           <Pressable
             onPress={() => {
@@ -239,12 +231,31 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         <View style={[styles.button]}>
           <Pressable
             onPress={() => {
+              updateStatus(qaItem.id, "archived");
+            }}
+          >
+            <Text>Used</Text>
+          </Pressable>
+        </View>
+        {isExpired(qaItem) ?
+        <View style={[styles.button]}>
+          <Pressable
+            onPress={() => {
               updateStatus(qaItem.id, "expired");
             }}
           >
             <Text>Expired</Text>
           </Pressable>
         </View>
+        :
+        <View style={[styles.button]}>
+          <Pressable
+            onPress={() => {handleButtonPress();console.log(inputText)}}
+          >
+            <Text>Share</Text>
+          </Pressable>
+        </View>
+        }
       </View>
     );
   };
@@ -270,7 +281,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
             <SelectDragIndicatorWrapper>
               <SelectDragIndicator />
             </SelectDragIndicatorWrapper>
-            {categories.map((category, index) => {
+            {categoryFilter.map((category, index) => {
               return (
                 <SelectItem
                   key={index}

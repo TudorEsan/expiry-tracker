@@ -9,7 +9,6 @@ interface Props {
   navigation: NavigationProp<ParamListBase>;
 }
 
-
 const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,7 +34,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
-        inputContainerStyle={{ borderBottomWidth: 0 }} // Hide underline
+        inputContainerStyle={{ borderBottomWidth: 0 }}
         style={styles.input}
       />
       <Input
@@ -43,7 +42,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         value={password}
         onChangeText={setPassword}
         secureTextEntry
-        inputContainerStyle={{ borderBottomWidth: 0 }} // Hide underline
+        inputContainerStyle={{ borderBottomWidth: 0 }}
         style={styles.input}
       />
       <Button
@@ -71,12 +70,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
   labelContainer: {
-    marginBottom: 100, // Adjust spacing between label and inputs
+    marginBottom: 100, //spacing between label and inputs
   },
   expiryLabel: {
     fontSize: 30,
     fontWeight: "bold",
-    color: "#333", // Adjust color if needed
+    color: "#333",
 
   },
   input: {

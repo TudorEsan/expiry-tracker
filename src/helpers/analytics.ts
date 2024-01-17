@@ -1,12 +1,10 @@
-import { auth } from "../../firebase.config";
-import { NOTIFY_BEFORE } from "../config";
+import { ONE_DAY } from "../config";
 // @ts-ignore
-function dateDifferenceInDays(date1, date2) {
-  
+function dateDifferenceInDays(date1, date2) { 
   const utcDate1 = Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate());
   const utcDate2 = Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate());
 
-  const differenceInDays =  Math.abs(Math.floor((utcDate2 - utcDate1) / NOTIFY_BEFORE));
+  const differenceInDays =  Math.abs(Math.floor((utcDate2 - utcDate1) / ONE_DAY));
   
   return differenceInDays;
 }
@@ -77,10 +75,10 @@ export function analyzeProducts(products: any[]) {
       productStatistics.valueWonByCategory[1]+= 1
     }
 
-    if (product.status === "expired" && product.category === "clothing") { 
+    if (product.status === "expired" && product.category === "medicine") { 
       productStatistics.valueLostByCategory[2]+= 1
     }
-    else if (product.status === "archived" && product.category === "clothing")
+    else if (product.status === "archived" && product.category === "medicine")
     {
       productStatistics.valueWonByCategory[2]+= 1
     }
