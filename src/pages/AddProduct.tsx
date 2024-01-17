@@ -136,7 +136,7 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
       <Button title="Select Date" onPress={showDatepicker} />
       {showDatePicker && (
         <DateTimePicker
-          
+          textColor="grey"
           value={prodExpiryDate}
           mode="date"
           is24Hour={true}
