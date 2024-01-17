@@ -24,12 +24,10 @@ import {
 import { NOTIFY_BEFORE } from "../config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { 
-   Button,
    Center,
    ChevronDownIcon,
    Divider,
    Icon,
-   ShareIcon,
    Select,
    SelectBackdrop,
    SelectContent,
@@ -163,9 +161,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   const checkForExpiringProducts = async (productsList: any[]) => {
-    console.log("-----------------------------------------------");
     for (const product of productsList) {
-      console.log(product);
       if (
         isExpired(product) &&
         !(await isProductAlreadyNotified(product.id))
@@ -204,18 +200,9 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [inputEmail, setInputEmail] = useState('');
-  const handleTransfer = async () => {
-    console.log("shared");
-  };
   
   const handleShareButtonPress = () => {
     setIsModalVisible(true);
-  };
-
-  const handleShareProduct = (email: string) => {
-    setIsModalVisible(false);
-    //shareOnWhatsApp();
   };
 
   const handleCloseModal = () => {

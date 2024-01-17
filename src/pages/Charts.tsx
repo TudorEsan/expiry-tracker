@@ -8,7 +8,6 @@ import { StyleSheet, Dimensions, ScrollView } from "react-native";
 
 export const Charts = () => {
   const [analytics, setAnalytics] = React.useState<any>(null);
-  const [products, setProducts] = React.useState<any>(null);
   useEffect(() => {
     const unsubscribe = onSnapshot(
       collection(db, "products"),
@@ -23,7 +22,6 @@ export const Charts = () => {
             expiry_date: new Date(data.expiry_date),
           };
         }).filter((product) => product.uid === currentUserUid);
-        setProducts(productsList);
         try {
           const analytics = analyzeProducts(productsList);
           console.log(analytics);
