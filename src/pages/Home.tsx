@@ -6,11 +6,11 @@ import {
   TouchableOpacity,
   Pressable,
   Dimensions,
+  Linking,
 } from "react-native";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
 //@ts-ignore
 import SwipeableFlatList from "react-native-swipeable-list";
-
 import { auth, db } from "../../firebase.config";
 import withAuthProtection from "../hocs/withAuthProtection";
 import {
@@ -20,12 +20,16 @@ import {
   onSnapshot,
   updateDoc,
 } from "firebase/firestore";
+
 import { NOTIFY_BEFORE } from "../config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Center,
+import { 
+   Button,
+   Center,
    ChevronDownIcon,
    Divider,
    Icon,
+   ShareIcon,
    Select,
    SelectBackdrop,
    SelectContent,
@@ -35,10 +39,12 @@ import { Center,
    SelectInput,
    SelectItem,
    SelectPortal,
-   SelectTrigger } from "@gluestack-ui/themed";
+   SelectTrigger 
+} from "@gluestack-ui/themed";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "@gluestack-ui/themed";
 import { categoryFilter } from "../config";
+import { format } from "date-fns";
 
 const darkColors = {
   background: "#121212",
@@ -196,16 +202,47 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     const toDelete = doc(db, "products", id);
     await deleteDoc(toDelete);
   };
-  const [inputText, setInputText] = useState('');
-  const handleButtonPress = () => {
-    Alert.prompt(
-      'Enter Name',
-      'Please enter your name:',
-      (text) => setInputText(text),
-      'plain-text',
-      inputText
-    );
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [inputEmail, setInputEmail] = useState('');
+  const handleTransfer = async () => {
+    console.log("shared");
   };
+  
+  const handleShareButtonPress = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleShareProduct = (email: string) => {
+    setIsModalVisible(false);
+    //shareOnWhatsApp();
+  };
+
+  const handleCloseModal = () => {
+    setIsModalVisible(false);
+  };
+
+  const shareProductDetails = (product: any) => {
+    const date = new Date(product.expiry_date);
+    const formattedExpiryDate = format(date, "MMMM do, yyyy");
+    const productDetails: string = 
+        product.name + " - " + 
+        formattedExpiryDate + (product.category ? (" - " + 
+        product.category) : "");
+    return productDetails;
+  };
+
+  const shareOneOnWhatsApp = (product: any) => {
+    let url = "whatsapp://send?text=" + encodeURIComponent(shareProductDetails(product));
+    Linking.canOpenURL(url).then(supported => {
+      if (supported) {
+        return Linking.openURL(url);
+      } else {
+        return Alert.alert("Error", "WhatsApp is not installed on your device");
+      }
+    }).catch(err => console.error('An error occurred', err));
+  };
+  
   const QuickActions = (index: number, qaItem: any) => {
     return (
       <View style={styles.qaContainer}>
@@ -249,10 +286,27 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         :
         <View style={[styles.button]}>
           <Pressable
-            onPress={() => {handleButtonPress();console.log(inputText)}}
+            onPress={() => shareOneOnWhatsApp(qaItem)}
           >
             <Text>Share</Text>
           </Pressable>
+          {/* <Modal visible={isModalVisible} transparent>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text>Enter Email address:</Text>
+            <TextInput
+              value={inputEmail}
+              onChangeText={(text) => setInputEmail(text)}
+              placeholder="Email"
+              style={styles.input}
+            />
+            <View style={styles.buttonContainer}>
+              <Button title="Share" onPress={() => handleShareProduct(inputEmail)} />
+              <Button title="Cancel" onPress={handleCloseModal} />
+            </View>
+          </View>
+        </View>
+      </Modal> */}
         </View>
         }
       </View>
@@ -263,10 +317,10 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     <View>
       <SafeAreaView>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: Dimensions.get("window").height * 0.06 + 10, borderBottomWidth: 2 }}>
-      <Text size="2xl" bold style={{marginLeft: "5%", marginBottom: "5%"}}>
+      <Text size="2xl" bold style={{paddingLeft: "5%", marginBottom: "5%"}}>
         Active Items
       </Text>
-      <Select onValueChange={(arg) => {setSelectedCategory(arg)}} style={{ width: 165, paddingBottom: "5%", paddingRight: "5%" }}>
+      <Select onValueChange={(arg) => {setSelectedCategory(arg)}} style={{ width: 165, paddingRight: "5%", marginBottom: "5%"}}>
         <SelectTrigger variant="rounded" size="md" >
           <SelectInput placeholder="Category" />
           {/* @ts-ignore */}
@@ -519,6 +573,30 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     opacity: colorEmphasis.high,
   },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+  },
+  input: {
+    borderBottomWidth: 1,
+    marginBottom: 10,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
 });
 
 export default withAuthProtection(HomeScreen);
+function database() {
+  throw new Error("Function not implemented.");
+}
+

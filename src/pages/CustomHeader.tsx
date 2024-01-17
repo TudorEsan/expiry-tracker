@@ -1,9 +1,9 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, } from "react-native";
 import { StackHeaderProps } from "@react-navigation/stack";
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebase.config";
-import { Button, Icon, SettingsIcon, ShareIcon ,EyeIcon} from "@gluestack-ui/themed";
+import { Button, Icon, SettingsIcon, ShareIcon, EyeIcon} from "@gluestack-ui/themed";
 
 const CustomHeader: React.FC<StackHeaderProps> = ({ navigation }) => {
   const handleSignOut = async () => {
@@ -14,10 +14,12 @@ const CustomHeader: React.FC<StackHeaderProps> = ({ navigation }) => {
       console.error(error);
     }
   };
-
+  
   return (
     <View style={styles.header}>
-      <Text style={styles.headerTitle}>ExpiryTrack Pro</Text>
+      <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+        <Text style={styles.headerTitle}>ExpiryTrack Pro</Text>
+      </TouchableOpacity>
       <Button
         size="sm"
         rounded="$full"

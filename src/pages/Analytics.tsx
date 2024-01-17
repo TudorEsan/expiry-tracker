@@ -68,7 +68,7 @@ export const Analytics = () => {
             Total Value lost: {analytics.totalValueOfExpired}
           </Text>
           <Text size="lg">
-            Average Value: {analytics.averageValuePerProduct}
+            Average Value: {analytics.averageValuePerProduct.toFixed(2)}
           </Text>
           <Text size="lg">
             Most likely to expire: {analytics.mostLikelyToExpire || "N/A"}
