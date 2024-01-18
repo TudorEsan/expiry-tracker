@@ -171,8 +171,8 @@ return(
     yAxisInterval={1}
     chartConfig={{
       backgroundColor: "#1fa305",
-      backgroundGradientFrom: "#4f7523",
-      backgroundGradientTo: "#1c9404",
+      backgroundGradientFrom: "#1c9404",
+      backgroundGradientTo: "#c7da27",
       decimalPlaces: 2,
       color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
       labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
