@@ -19,6 +19,9 @@ import { config } from "@gluestack-ui/config";
 import { GluestackUIProvider } from "@gluestack-ui/themed";
 import { Analytics } from "./src/pages/Analytics";
 import {Charts} from "./src/pages/Charts";
+import { LogBox } from "react-native";
+
+LogBox.ignoreAllLogs(true);
 
 export type RootStackParamList = {
   Home: undefined;
