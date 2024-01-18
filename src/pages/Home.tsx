@@ -21,7 +21,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
-import { NOTIFY_BEFORE } from "../config";
+import { NOTIFY_BEFORE, ONE_DAY } from "../config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { 
    Center,
@@ -174,7 +174,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         !(await isProductAlreadyNotified(product.id))
       ) {
         Alert.alert("Expiration Alert", `${product.name} is expiring soon!`);
-        
+        await storeExpiredProductId(product.id);
       }
     }
   };
@@ -186,12 +186,13 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
   const isExpired = (product: any) => {
     const now = new Date();
-    return product.expiry_date < now.getTime();
+    return new Date(product.expiry_date).getTime() + ONE_DAY< now.getTime();
   };
 
   const isExpiringSoon = (product: any) => {
     const now = new Date();
-    return product.expiry_date - now.getTime() <= NOTIFY_BEFORE;
+    return new Date(product.expiry_date).getTime() - now.getTime() <= NOTIFY_BEFORE;
+   
   };
 
   const handleDelete = async (id: string) => {
@@ -458,11 +459,11 @@ const styles = StyleSheet.create({
   },
   expired: {
     color: "white",
-    backgroundColor: "#e49c04"
+    backgroundColor: "#e8590b"
   },
   expiringSoon: {
     color: "white",
-    backgroundColor: "#fcd37c"
+    backgroundColor: "#f49900"
   },
   centeredView: {
     flex: 1,

@@ -72,7 +72,7 @@ return(
     yAxisInterval={1} 
     chartConfig={{
       backgroundColor: "#e26a00",
-      backgroundGradientFrom: "#fb8c00",
+      backgroundGradientFrom: "#e8590b",
       backgroundGradientTo: "#ffa726",
       decimalPlaces: 2, 
       color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
@@ -99,35 +99,35 @@ return(
   data={[{
     name: "Food",
     population: analytics.valueLostByCategory[4],
-    color: "#e49c04",
+    color: "#e8590b",
     legendFontColor: "#7F7F7F",
     legendFontSize: 15
   },
   {
       name: "Home",
       population: analytics.valueLostByCategory[3],
-      color: "#fcd37c",
+      color: "#ff8100",
       legendFontColor: "#7F7F7F",
       legendFontSize: 15
     },
     {
       name: "Medicine",
       population: analytics.valueLostByCategory[2],
-      color: "#d07804",
+      color: "#af6147",
       legendFontColor: "#7F7F77",
       legendFontSize: 15
     },
     {
       name: "Books",
       population: analytics.valueLostByCategory[1],
-      color: "#877444",
+      color: "#db9424",
       legendFontColor: "#7F7F7F",
       legendFontSize: 15
     },
     {
       name: "Electronics",
       population: analytics.valueLostByCategory[0],
-      color: "#966602",
+      color: "#f49900",
       legendFontColor: "#7F7F7F",
       legendFontSize: 15
     }]}
