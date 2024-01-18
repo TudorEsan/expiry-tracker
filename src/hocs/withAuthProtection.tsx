@@ -1,4 +1,3 @@
-// hocs/withAuthProtection.tsx
 import React, { useEffect, useState, FC } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { User, onAuthStateChanged } from 'firebase/auth';
@@ -14,11 +13,10 @@ const withAuthProtection = <P extends object>(WrappedComponent: FC<P>) => {
         setUser(user);
         setCheckingStatus(false);
       });
-      return unsubscribe; // Unsubscribe on unmount
+      return unsubscribe;
     }, []);
 
     if (checkingStatus) {
-      // Return a loading indicator while checking user status
       return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <ActivityIndicator size='large' />
@@ -27,12 +25,9 @@ const withAuthProtection = <P extends object>(WrappedComponent: FC<P>) => {
     }
 
     if (!user) {
-      // If there is no user logged in, don't render the component
-      // Handle redirection or display a message based on your app's flow
       return null;
     }
 
-    // If the user is logged in, render the wrapped component
     return <WrappedComponent {...props} />;
   };
 };

@@ -132,6 +132,21 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       unsubscribe();
     };
   }, []);
+  
+  const updateStatus = async (id: string, status: string) => {
+    const toUpdate = doc(db, "products", id);
+    await updateDoc(toUpdate, { status });
+  };
+
+  const isExpired = (product: any) => {
+    const now = new Date();
+    return new Date(product.expiry_date).getTime() + ONE_DAY< now.getTime();
+  };
+
+  const isExpiringSoon = (product: any) => {
+    const now = new Date();
+    return new Date(product.expiry_date).getTime() - now.getTime() <= NOTIFY_BEFORE;
+  };
 
   const storeExpiredProductId = async (id: string) => {
     try {
@@ -179,35 +194,9 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     }
   };
 
-  const updateStatus = async (id: string, status: string) => {
-    const toUpdate = doc(db, "products", id);
-    await updateDoc(toUpdate, { status });
-  };
-
-  const isExpired = (product: any) => {
-    const now = new Date();
-    return new Date(product.expiry_date).getTime() + ONE_DAY< now.getTime();
-  };
-
-  const isExpiringSoon = (product: any) => {
-    const now = new Date();
-    return new Date(product.expiry_date).getTime() - now.getTime() <= NOTIFY_BEFORE;
-   
-  };
-
   const handleDelete = async (id: string) => {
     const toDelete = doc(db, "products", id);
     await deleteDoc(toDelete);
-  };
-
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  
-  const handleShareButtonPress = () => {
-    setIsModalVisible(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalVisible(false);
   };
 
   const shareProductDetails = (product: any) => {
@@ -278,23 +267,6 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
           >
             <Text>Share</Text>
           </Pressable>
-          {/* <Modal visible={isModalVisible} transparent>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text>Enter Email address:</Text>
-            <TextInput
-              value={inputEmail}
-              onChangeText={(text) => setInputEmail(text)}
-              placeholder="Email"
-              style={styles.input}
-            />
-            <View style={styles.buttonContainer}>
-              <Button title="Share" onPress={() => handleShareProduct(inputEmail)} />
-              <Button title="Cancel" onPress={handleCloseModal} />
-            </View>
-          </View>
-        </View>
-      </Modal> */}
         </View>
         }
       </View>
@@ -561,18 +533,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     opacity: colorEmphasis.high,
   },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    width: '80%',
-  },
   input: {
     borderBottomWidth: 1,
     marginBottom: 10,
@@ -584,7 +544,3 @@ const styles = StyleSheet.create({
 });
 
 export default withAuthProtection(HomeScreen);
-function database() {
-  throw new Error("Function not implemented.");
-}
-
