@@ -49,7 +49,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         title="Sign Up"
         onPress={handleSignUp}
         buttonStyle={styles.loginButton}
-        titleStyle={styles.loginButtonText}
+        // titleStyle={styles.loginButtonText}
       />
       <Button
         title="Already have an account? Login"

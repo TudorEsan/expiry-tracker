@@ -89,7 +89,6 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
         title="Login"
         onPress={handleLogin}
         buttonStyle={styles.loginButton}
-        titleStyle={styles.loginButtonText}
       />
       <Button
         title="Don't have an account? Sign Up"
@@ -127,14 +126,16 @@ const styles = StyleSheet.create({
   loginButton: {
     backgroundColor: "black",
     marginTop: 50,
-    width: "100%",
+    width: 250,
     borderRadius: 25,
+    display: "flex",
     justifyContent: "center",
     alignItems: "center",
     margin: "auto",
   },
   loginButtonText: {
     marginRight: 100,
+    textAlign: 'center'
   },
   signupButton: {
     backgroundColor: "transparent",
