@@ -132,7 +132,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       unsubscribe();
     };
   }, []);
-  
+
   const updateStatus = async (id: string, status: string) => {
     const toUpdate = doc(db, "products", id);
     await updateDoc(toUpdate, { status });
@@ -276,11 +276,11 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <View>
       <SafeAreaView>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: Dimensions.get("window").height * 0.06 + 10, borderBottomWidth: 2 }}>
+      <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: Dimensions.get("window").height * 0.06 + 10, borderBottomWidth: 2}}>
       <Text size="2xl" bold style={{paddingLeft: "5%", marginBottom: "5%"}}>
         Active Items
       </Text>
-      <Select onValueChange={(arg) => {setSelectedCategory(arg)}} style={{ width: 165, paddingRight: "5%", marginBottom: "5%"}}>
+      <Select onValueChange={(arg) => {setSelectedCategory(arg)}} style={{width: 180, paddingRight: "5%", marginBottom: "5%"}}>
         <SelectTrigger variant="rounded" size="md" >
           <SelectInput placeholder="Category" />
           {/* @ts-ignore */}

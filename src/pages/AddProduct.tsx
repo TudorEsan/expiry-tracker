@@ -62,11 +62,7 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
       id: Math.random().toString(36).substr(2, 9),
       uid : auth.currentUser?.uid,
     })
-      .then((ref) => {
-        console.log(ref.id);
-        Alert.alert(prodName, " successfully added!", [
-          { text: "OK", onPress: () => navigation.navigate("Home") }
-        ]);
+      .then(() => {
         navigation.navigate("Home");
       })
       .catch((error) => {
@@ -85,7 +81,7 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
         <InputField
           value={prodName}
           onChange={(e) => setProdName(e.nativeEvent.text)}
-          placeholder="Product Name"
+          placeholder="Item Name"
         />
       </Input>
 
@@ -133,7 +129,7 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
       </Select>
 
       <Text>{prodExpiryDate.toLocaleDateString()}</Text>
-      <Button title="Select Date" onPress={showDatepicker} />
+      <Button title="Select Expiry Date" onPress={showDatepicker} />
       {showDatePicker && (
         <DateTimePicker
           textColor="grey"
@@ -145,7 +141,7 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
         />
       )}
       <Button
-        title="Add Product"
+        title="Add Item"
         onPress={addProduct}
         buttonStyle={styles.loginButton}
         titleStyle={styles.loginButtonText}

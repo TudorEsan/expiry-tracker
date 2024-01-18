@@ -49,7 +49,6 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         title="Sign Up"
         onPress={handleSignUp}
         buttonStyle={styles.loginButton}
-        // titleStyle={styles.loginButtonText}
       />
       <Button
         title="Already have an account? Login"
@@ -88,13 +87,16 @@ const styles = StyleSheet.create({
   loginButton: {
     backgroundColor: "black",
     marginTop: 50,
-    width: "100%",
+    width: 250,
     borderRadius: 25,
+    display: "flex",
     justifyContent: "center",
     alignItems: "center",
+    margin: "auto",
   },
   loginButtonText: {
     marginRight: 100,
+    textAlign: 'center'
   },
   signupButton: {
     backgroundColor: "transparent",

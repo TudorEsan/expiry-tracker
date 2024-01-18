@@ -78,7 +78,7 @@ const EditProduct: React.FC<Props> = ({ route, navigation }) => {
         <InputField
           value={prodName}
           onChange={(e) => setProdName(e.nativeEvent.text)}
-          placeholder="Product Name"
+          placeholder="Item Name"
         />
       </Input>
 
@@ -126,7 +126,7 @@ const EditProduct: React.FC<Props> = ({ route, navigation }) => {
       </Select>
 
       <Text>{prodExpiryDate.toLocaleDateString()}</Text>
-      <Button title="Select Date" onPress={showDatepicker} />
+      <Button title="Select Expiry Date" onPress={showDatepicker} />
       {showDatePicker && (
         <DateTimePicker
           value={prodExpiryDate}
@@ -137,7 +137,7 @@ const EditProduct: React.FC<Props> = ({ route, navigation }) => {
         />
       )}
       <Button
-        title="Edit Product"
+        title="Edit Item"
         onPress={editProduct}
         buttonStyle={styles.loginButton}
         titleStyle={styles.loginButtonText}

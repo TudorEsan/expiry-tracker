@@ -51,11 +51,11 @@ export const Analytics = () => {
         <Text size="3xl" style={styles.element}>Analytics</Text>
         <VStack>
           <Text size="xl" style={styles.element}>
-            Expired Product Count:{" "}
+            Expired Items Count:{" "}
             {analytics.statusDistribution?.expired ?? "N/A"}
           </Text>
           <Text size="xl" style={styles.element}>
-            Active Products Count:{" "}
+            Active Items Count:{" "}
             {analytics.statusDistribution?.active ?? "N/A"}
           </Text>
           <Text size="xl" style={styles.element}>
@@ -76,7 +76,7 @@ export const Analytics = () => {
             {analytics.likelyToBeArchived || "N/A"}
           </Text>
           <Text size="xl" style={styles.element}>
-            All Products Count: {analytics.totalProducts || "N/A"}
+            All Items Count: {analytics.totalProducts || "N/A"}
           </Text>
         </VStack>       
       </Center>

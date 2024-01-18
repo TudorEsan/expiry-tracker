@@ -8,6 +8,7 @@ export const categories = [
   { label: "Medicine", value: "medicine" },
   { label: "Home", value: "home" },
   { label: "Food", value: "food" },
+  { label: "Subscriptions", value: "subscriptions" },
 ];
 
 export const categoryFilter = [
@@ -17,5 +18,6 @@ export const categoryFilter = [
   { label: "Medicine", value: "medicine" },
   { label: "Home", value: "home" },
   { label: "Food", value: "food" },
-  { label: "None", value: "" },
+  { label: "Subscriptions", value: "subscriptions" },
+  { label: "Other", value: "" },
 ];
