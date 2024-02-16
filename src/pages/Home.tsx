@@ -7,6 +7,8 @@ import {
   Pressable,
   Dimensions,
   Linking,
+  Button,
+  TextInput,
 } from "react-native";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
 //@ts-ignore
@@ -43,6 +45,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "@gluestack-ui/themed";
 import { categoryFilter } from "../config";
 import { format } from "date-fns";
+import Modal from "react-native-modal";
 
 const darkColors = {
   background: "#121212",
@@ -69,10 +72,16 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     navigation.navigate("AddProduct");
   };
   const [products, setProducts] = useState<any[]>([]);
-  const [selectedProduct, setSelectedProduct] = useState(null);
   const [expired, setExpired] = useState<any[]>([]);
   const [active, setActive] = useState<any[]>([]);
   const [archived, setArchived] = useState<any[]>([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isEmailModalVisible, setIsEmailModalVisible] = useState(false);
+  const [email, setEmail] = useState(auth.currentUser?.email);
+  const [sendItem, setSendItem] = useState<any>();
+
+  const handleModal = () => setIsModalVisible(() => !isModalVisible);
+  const handleEmailModal = () => setIsEmailModalVisible(() => !isEmailModalVisible);
 
   const extractItemKey = (item: any) => {
     return item.id.toString();
@@ -84,7 +93,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     const archived: any[] = [];
 
     for (const product of products) {
-      if (product.uid == auth.currentUser?.uid)
+      if (product.mail == auth.currentUser?.email)
       {
       switch (product.status) {
         case "expired":
@@ -110,13 +119,15 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         const productsList = snapshot.docs
           .map((doc) => {
             const data = doc.data();
+            console.log(data);
             return {
               ...data,
+              mail: data.mail,
               id: doc.id,
               uid: data.uid,
               expiry_date: new Date(data.expiry_date),
             };
-          }).filter((product) => product.uid === currentUserUid)
+          }).filter((product) => product?.mail === auth.currentUser?.email)
           //@ts-ignore
           .sort((a, b) => a.expiry_date - b.expiry_date);
         const { expired, active, archived } = groupByStatus(productsList);
@@ -140,7 +151,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
   const isExpired = (product: any) => {
     const now = new Date();
-    return new Date(product.expiry_date).getTime() + ONE_DAY< now.getTime();
+    return product.expiry_date.getTime() < now.getTime();
   };
 
   const isExpiringSoon = (product: any) => {
@@ -208,8 +219,19 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         product.category) : "");
     return productDetails;
   };
+  
+  const shareInTheApp = async (product: any) => {
+    const productRef = doc(collection(db, "products"), product.id);
+    await updateDoc(productRef, {mail: email})
+      .then(() => {
+        Alert.alert(product.name + " sent successfully!");
+      })
+      .catch((error) => {
+        Alert.alert("Error:", error.message);
+      });
+  };
 
-  const shareOneOnWhatsApp = (product: any) => {
+  const shareOnWhatsApp = (product: any) => {
     let url = "whatsapp://send?text=" + encodeURIComponent(shareProductDetails(product));
     Linking.canOpenURL(url).then(supported => {
       if (supported) {
@@ -218,6 +240,10 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         return Alert.alert("Error", "WhatsApp is not installed on your device");
       }
     }).catch(err => console.error('An error occurred', err));
+  };
+  
+  const handleShareButtonPress = (product: any) => {
+    handleModal();
   };
   
   const QuickActions = (index: number, qaItem: any) => {
@@ -263,10 +289,43 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         :
         <View style={[styles.button]}>
           <Pressable
-            onPress={() => shareOneOnWhatsApp(qaItem)}
+            onPress={() => {handleModal(); setSendItem(qaItem);}}
           >
             <Text>Share</Text>
           </Pressable>
+          
+        <Modal isVisible={isModalVisible} onBackdropPress={handleModal} style={styles.modal} backdropOpacity={0}>
+        <View style={styles.modalContainer}>
+          <View style={styles.buttonContainer}>
+          <Pressable
+            onPress={() => handleEmailModal()}
+          >
+            <Text style={styles.shareButtonText}>In the App</Text>
+          </Pressable>
+          
+          <Pressable
+            onPress={() => {shareOnWhatsApp(sendItem); handleModal();}}
+          >
+            <Text style={styles.shareButtonText}>On WhatsApp</Text>
+          </Pressable>
+          </View>
+        </View>
+      </Modal>
+      {/* Email Input Modal */}
+      <Modal isVisible={isEmailModalVisible} onBackdropPress={handleEmailModal} style={styles.emailModal} backdropOpacity={0}>
+        <View style={styles.emailModalContainer}>
+          <Text style={styles.modalTitle}>Enter Email Address</Text>
+          <TextInput
+            style={styles.emailInput}
+            placeholder="Email Address"
+            placeholderTextColor={"grey"}
+            onChangeText={(text) => setEmail(text)}
+          />
+          <Pressable onPress={() => {shareInTheApp(sendItem); handleEmailModal(); handleModal();}} style={styles.sendButton}>
+            <Text style={styles.sendButtonText}>Send</Text>
+          </Pressable>
+        </View>
+      </Modal>
         </View>
         }
       </View>
@@ -362,6 +421,62 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  modal: {
+    justifyContent: 'flex-end',
+    margin: 0,
+  },
+  emailModal: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    backgroundColor: "black",
+    padding: 30,
+    height: '12%',
+    borderRadius: 10,
+  },
+  emailModalContainer: {
+    backgroundColor: "black",
+    padding: 20,
+    borderRadius: 10,
+    width: "80%",
+  },
+  buttonContainer: {
+    flex: 1,
+    justifyContent: 'space-around',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  shareButtonText: {
+    color: "white",
+  },
+  modalTitle: {
+    fontSize: 18,
+    marginBottom: 10,
+    fontWeight: 'bold',
+    color: "white",
+  },
+  emailInput: {
+    color: "white",
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 10,
+    padding: 10,
+    borderRadius: 5,
+  },
+  sendButton: {
+    padding: 10,
+    backgroundColor: 'white',
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sendButtonText: {
+    fontSize: 16,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   container: {
     flex: 1,
     justifyContent: "center",
@@ -536,10 +651,6 @@ const styles = StyleSheet.create({
   input: {
     borderBottomWidth: 1,
     marginBottom: 10,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
   },
 });
 

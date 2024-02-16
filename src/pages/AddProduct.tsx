@@ -52,7 +52,6 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
   };
 
   const addProduct = async () => {
-    console.log(prodCategory);
     await addDoc(collection(db, "products"), {
       name: prodName,
       category: prodCategory,
@@ -61,6 +60,7 @@ const AddProduct: React.FC<Props> = ({ navigation }) => {
       value: prodValue,
       id: Math.random().toString(36).substr(2, 9),
       uid : auth.currentUser?.uid,
+      mail: auth.currentUser?.email,
     })
       .then(() => {
         navigation.navigate("Home");
