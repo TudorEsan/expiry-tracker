@@ -119,7 +119,6 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         const productsList = snapshot.docs
           .map((doc) => {
             const data = doc.data();
-            console.log(data);
             return {
               ...data,
               mail: data.mail,
@@ -211,24 +210,57 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   const shareProductDetails = (product: any) => {
-    const date = new Date(product.expiry_date);
-    const formattedExpiryDate = format(date, "MMMM do, yyyy");
-    const productDetails: string = 
-        product.name + " - " + 
-        formattedExpiryDate + (product.category ? (" - " + 
-        product.category) : "");
+    let productDetails: string = "";
+    if (product != null) {
+      const date = new Date(product.expiry_date);
+      const formattedExpiryDate = format(date, "MMMM do, yyyy");
+      productDetails = 
+          product.name + " - " + 
+          formattedExpiryDate + (product.category ? (" - " + 
+          product.category) : "");
+    }
+    else {
+      active.forEach((item, index) => {
+        if (!isExpired(item)) {
+          const date = new Date(item.expiry_date);
+          const formattedExpiryDate = format(date, "MMMM do, yyyy");
+          productDetails = 
+              productDetails +
+              item.name + " - " + 
+              formattedExpiryDate + (item.category ? (" - " + 
+               item.category) : "") +
+              "\n";
+        }
+      });
+    }
     return productDetails;
   };
   
   const shareInTheApp = async (product: any) => {
-    const productRef = doc(collection(db, "products"), product.id);
-    await updateDoc(productRef, {mail: email})
-      .then(() => {
-        Alert.alert(product.name + " sent successfully!");
-      })
-      .catch((error) => {
-        Alert.alert("Error:", error.message);
+    if (product != null) {
+      const productRef = doc(collection(db, "products"), product.id);
+      await updateDoc(productRef, {mail: email})
+        .then(() => {
+          Alert.alert(product.name + " sent successfully!");
+        })
+        .catch((error) => {
+          Alert.alert("Error:", error.message);
+        });
+    }
+    else {
+      active.forEach(async (item, index) => {
+        if (!isExpired(item)) {
+          const productRef = doc(collection(db, "products"), item.id);
+          await updateDoc(productRef, {mail: email})
+            .then(() => { })
+            .catch((error) => {
+             Alert.alert("Error:", error.message);
+          });
+        }
       });
+      setActive([]);
+      Alert.alert("Items sent successfully!");
+    }
   };
 
   const shareOnWhatsApp = (product: any) => {
@@ -240,10 +272,6 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         return Alert.alert("Error", "WhatsApp is not installed on your device");
       }
     }).catch(err => console.error('An error occurred', err));
-  };
-  
-  const handleShareButtonPress = (product: any) => {
-    handleModal();
   };
   
   const QuickActions = (index: number, qaItem: any) => {
@@ -408,19 +436,34 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
           ItemSeparatorComponent={<Divider />}
         />
       </SafeAreaView>
-      <Center>
+      <View style={styles.buttons}>
+        <TouchableOpacity
+          style={{ ...styles.shareProductsButton, opacity: 0 }}
+        >
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.addProductButton}
           onPress={handleAddProduct}
         >
           <Text style={styles.addProductButtonText}>+</Text>
         </TouchableOpacity>
-      </Center>
+      <TouchableOpacity
+          style={styles.shareProductsButton}
+          onPress={() => {handleModal(); setSendItem(null);}}
+        >
+          <Text style={{ ...styles.addProductButtonText, marginBottom: 15}}>...</Text>
+        </TouchableOpacity>
+        </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  buttons: {
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   modal: {
     justifyContent: 'flex-end',
     margin: 0,
@@ -508,6 +551,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: "5%",
     marginBottom: "5%",
+  },
+  shareProductsButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 12.5,
+    backgroundColor: "black",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: "5%",
+    marginBottom: "5%",
+    marginRight: 5,
   },
   addProductButtonText: {
     fontSize: 30,
